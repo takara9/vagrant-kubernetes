@@ -1,0 +1,112 @@
+- hosts: master
+  become: yes
+  become_user: root  
+  gather_facts: True
+  vars:
+    join_cmd: /vagrant/ansible-playbook/kubeadm-join.yaml
+  
+  tasks:
+    # HostOnly Interface の IPアドレス取得
+    #
+    - name: getting hostonly ip address
+      command: ifconfig enp0s8
+      register: ip
+    - debug: var=ip.stdout_lines[1].split(':')[1].split(' ')[0]
+
+    # 10-kubeadmin.conf に --node-ipを追加
+    #
+    - name: change 10-kubeadm.conf
+      replace:
+        dest: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+        regexp: 'KUBELET_EXTRA_ARGS$'
+        replace: KUBELET_EXTRA_ARGS --node-ip={{ ip.stdout_lines[1].split(':')[1].split(' ')[0] }} --cluster-dns=10.244.0.10
+
+    # 変更を反映
+    #
+    - name: daemon-reload and restart kubelet 変更を反映
+      systemd:
+        state: restarted
+        daemon_reload: yes
+        name: kubelet
+
+    # k8sマスタを初期化
+    #
+    - name: kubeadm reset
+      command: kubeadm reset -f
+    - name: kubeadm init
+      command: kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ ip.stdout_lines[1].split(':')[1].split(' ')[0] }} --service-cidr=10.244.0.0/16
+      register: join
+    #- debug: var=join
+    - debug: var=join.stdout_lines[62]
+
+    # k8sノード用コマンドを保存
+    #
+    - shell: rm -f {{ join_cmd }}
+    - shell: echo "join_command" ":" {{ join.stdout_lines[62] }} > {{ join_cmd }}
+
+    # kubeletのDNSのIPアドレスを変更
+    #
+    - name: change config.yaml
+      replace:
+        dest: /var/lib/kubelet/config.yaml
+        regexp: '10.96.0.10'
+        replace: 10.244.0.10
+
+    # kubeletをリスタートして変更を反映
+    #
+    - name: daemon-reload and restart kubelet
+      systemd:
+        state: restarted
+        daemon_reload: yes
+        name: kubelet
+
+    # kubeconfigディレクトリ作成
+    #
+    - name: mkdir kubeconfig
+      file:
+        path:  /home/vagrant/.kube
+        state: directory
+        owner: vagrant
+        group: vagrant
+        mode:  0755
+
+    #  configファイルのコピー
+    #
+    #- name: copy config
+    #  copy:
+    #    src:  /etc/kubernetes/admin.conf
+    #    dest: /home/vagrant/.kube/config
+    #    owner: root
+    #    group: root
+    #    mode:  0644
+    - shell: cp /etc/kubernetes/admin.conf /home/vagrant/.kube/config
+    - shell: chown vagrant:vagrant /home/vagrant/.kube/config
+    - shell: chmod 0600 /home/vagrant/.kube/config
+    - shell: rm -fr /vagrant/kubeconfig
+    - shell: cp -fr /home/vagrant/.kube /vagrant/kubeconfig
+
+
+    # flannelのマニフェストダウンロード
+    #
+    - name: download Manifest of Flannel 
+      get_url:
+        url: https://raw.githubusercontent.com/coreos/flannel/v0.10.0/Documentation/kube-flannel.yml
+        dest: /home/vagrant/
+        mode: 0644
+        owner: vagrant
+        group: vagrant
+
+    # インタフェースの追加
+    #
+    - name: add a new line
+      blockinfile:
+        dest: /home/vagrant/kube-flannel.yml
+        insertafter: '--kube-subnet-mgr$'
+        content: '        - --iface=enp0s8'
+
+    # Flannelのデプロイ
+    #
+    - name: Deploy Flannel 
+      become_user: vagrant
+      command: kubectl apply -f /home/vagrant/kube-flannel.yml
+      
