@@ -3,7 +3,9 @@
 #
 
 Vagrant.configure(2) do |config|
-  
+
+  # ノード１ 仮想マシンの起動
+  #
   config.vm.define 'node1' do |machine|
     machine.vm.box = "ubuntu/xenial64"
     machine.vm.hostname = 'node1'
@@ -14,6 +16,9 @@ Vagrant.configure(2) do |config|
       vbox.cpus = 1
       vbox.memory = 1024
     end
+
+    # ノード１ docker & k8sのインストール 
+    #
     machine.vm.provision "ansible_local" do |ansible|
       ansible.playbook       = "ansible-playbook/kubernetes.yml"
       ansible.version        = "2.6.3"
@@ -27,6 +32,9 @@ Vagrant.configure(2) do |config|
     #EOF
   end
 
+
+  # ノード２ 仮想マシンの起動
+  #
   config.vm.define 'node2' do |machine|
     machine.vm.box = "ubuntu/xenial64"
     machine.vm.hostname = 'node2'
@@ -37,6 +45,9 @@ Vagrant.configure(2) do |config|
       vbox.cpus = 1
       vbox.memory = 1024
     end
+
+    # ノード２ docker & k8sのインストール 
+    #
     machine.vm.provision "ansible_local" do |ansible|
       ansible.playbook       = "ansible-playbook/kubernetes.yml"
       ansible.version        = "2.6.3"
@@ -49,7 +60,11 @@ Vagrant.configure(2) do |config|
     #  apt-get update && apt-get install -y python-minimal
     #EOF
   end
-  
+
+
+  #
+  # マスタ 仮想マシンの起動
+  #
   config.vm.define 'master' do |machine|
     machine.vm.box = "ubuntu/xenial64"
     machine.vm.hostname = 'master'
@@ -60,17 +75,21 @@ Vagrant.configure(2) do |config|
       vbox.cpus = 1
       vbox.memory = 1024
     end
+
+    #
+    # マスタ docker & k8sのインストール 
+    #
     machine.vm.provision "ansible_local" do |ansible|
       ansible.playbook       = "ansible-playbook/kubernetes.yml"
       ansible.version        = "2.6.3"
-      #ansible.playbook      = "ansible-playbook/test.yml"
       ansible.verbose        = false
       ansible.install        = true
       ansible.limit          = "master" # or only "nodes" group, etc.
       ansible.inventory_path = "ansible-playbook/hosts"
     end
 
-
+    # マスタのセットアップ
+    #
     machine.vm.provision "ansible_local" do |ansible|
       ansible.playbook      = "ansible-playbook/k8s_master.yml"
       ansible.version        = "2.6.3"
@@ -80,6 +99,8 @@ Vagrant.configure(2) do |config|
       ansible.inventory_path = "ansible-playbook/hosts"
     end
 
+    # ノードのセットアップ
+    #
     machine.vm.provision "ansible_local" do |ansible|
       ansible.playbook      = "ansible-playbook/k8s_nodes.yml"
       ansible.version        = "2.6.3"

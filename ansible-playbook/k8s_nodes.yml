@@ -1,57 +1,45 @@
 - hosts: nodes
   become: yes
   gather_facts: True
+
   tasks:
-    - name: include vars
+    - name: include k8s version
+      include_vars: /vagrant/ansible-playbook/versions.yml
+    - name: include kubeadm join token etc
       include_vars: /vagrant/ansible-playbook/kubeadm-join.yaml
 
-
-    # HostOnly Interface の IPアドレス取得
+    ## k8sノードをリセット
     #
-    - name: getting hostonly ip address
-      command: ifconfig enp0s8
-      register: ip
-    - debug: var=ip.stdout_lines[1].split(':')[1].split(' ')[0]
-
-    # 10-kubeadmin.conf に --node-ipを追加
-    #
-    - name: change 10-kubeadm.conf
-      replace:
-        dest: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
-        regexp: 'KUBELET_EXTRA_ARGS$'
-        replace: KUBELET_EXTRA_ARGS --node-ip={{ ip.stdout_lines[1].split(':')[1].split(' ')[0] }} --cluster-dns=10.244.0.10
-
-    # 変更を反映
-    #
-    - name: daemon-reload and restart kubelet 変更を反映
-      systemd:
-        state: restarted
-        daemon_reload: yes
-        name: kubelet
-
-
-    # k8sノードをクラスタへ参加
-    #
-    - debug: var=join_command
-    - name: kubeadm reset
+    - name: kubeadm reset v1.11 or later
       command: kubeadm reset -f
+      when: k8s_minor_ver == "11"
+
+    - name: kubeadm reset v1.10 or eary
+      command: kubeadm reset
+      when: (k8s_minor_ver == "10") or (k8s_minor_ver == "9")
+
+
+    ## k8sクラスタへ参加
+    #
     - name: kubeadm join
       command: "{{ join_command }}"
 
-    # kubeletのDNSのIPアドレスを変更
+
+    ## kubeletのDNSのIPアドレスを変更
     #
     - name: change config.yaml
       replace:
         dest: /var/lib/kubelet/config.yaml
         regexp: '10.96.0.10'
         replace: 10.244.0.10
+      when: k8s_minor_ver == "11"
 
-    # kubeletをリスタートして変更を反映
+    ## kubeletをリスタートして変更を反映
     #
     - name: daemon-reload and restart kubelet
       systemd:
         state: restarted
         daemon_reload: yes
         name: kubelet
-
+      when: k8s_minor_ver == "11"
 

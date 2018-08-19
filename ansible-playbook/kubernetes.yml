@@ -3,22 +3,17 @@
   become: yes
   gather_facts: True
   
-  vars:
-    #- k8s_version: =1.9.6-00
-    #- k8s_version: =1.10.3-00
-    - k8s_version:
-
-    #- docker_version: =17.12.1~ce-0~ubuntu
-    - docker_version: =17.03.2~ce-0~ubuntu-xenial
-
   tasks:
-  #
-  # Docker CE のインストール
+  - name: include vars
+    include_vars: /vagrant/ansible-playbook/versions.yml
+
+  - debug: var=k8s_minor_ver
+
+
+  ## Docker CE のインストール
   #
   - name: Add Docker GPG key
     apt_key: url=https://download.docker.com/linux/ubuntu/gpg
-
-  - debug: var={{ansible_distribution_release}}
 
   - name: Add Docker APT repository
     apt_repository:
@@ -48,8 +43,7 @@
       name: vagrant
       groups: docker
 
-  #
-  # カーネル設定変更
+  ## カーネル設定変更
   #
   - name: Set sysctl 
     sysctl:
@@ -60,8 +54,7 @@
       state: present
       reload: yes
 
-  #
-  # GlusterFS のインストール
+  ## GlusterFS のインストール
   #
   - name: Add GlusterFS Repository
     apt_repository:
@@ -74,8 +67,7 @@
       update_cache: yes
 
 
-  #
-  # Kubernetes のインストール
+  ## Kubernetes のインストール
   #
   - name: add Kubernetes apt-key
     apt_key:
@@ -116,4 +108,44 @@
       state: present
       update_cache: yes
 
+
+  ## k8sのVagrant対応に、ノードのIPアドレスを設定 
+  #
+  - name: include vars
+    include_vars: /vagrant/ansible-playbook/versions.yml
+
+
+  ## HostOnly Interface の IPアドレス取得
+  #
+  - name: getting hostonly ip address
+    command: ifconfig enp0s8
+    register: ip
+  - debug: var=ip.stdout_lines[1].split(':')[1].split(' ')[0]
+
+
+
+  ## 10-kubeadmin.conf に --node-ipを追加
+  #
+  - name: change 10-kubeadm.conf for v1.11
+    replace:
+      dest: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+      regexp: 'KUBELET_EXTRA_ARGS$'
+      replace: KUBELET_EXTRA_ARGS --node-ip={{ ip.stdout_lines[1].split(':')[1].split(' ')[0] }} --cluster-dns=10.244.0.10
+    when: k8s_minor_ver == "11"
+
+  - name: change 10-kubeadm.conf for v1.9 or v1.10
+    replace:
+      dest: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+      regexp: '^Environment="KUBELET_DNS_ARGS='
+      replace: Environment="KUBELET_DNS_ARGS=--cluster-dns=10.244.0.10 --cluster-domain=cluster.local --node-ip=--node-ip={{ ip.stdout_lines[1].split(':')[1].split(' ')[0] }}"
+    when: (k8s_minor_ver == "10") or (k8s_minor_ver == "9")
+
+
+  ## 変更を反映
+  #
+  - name: daemon-reload and restart kubelet
+    systemd:
+      state: restarted
+      daemon_reload: yes
+      name: kubelet
 
