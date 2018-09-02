@@ -60,9 +60,9 @@
     apt_repository:
       repo: ppa:gluster/glusterfs-3.12
 
-  - name: Install GlusterFS
+  - name: Install GlusterFS client
     apt:
-      name: glusterfs-server
+      name: glusterfs-client
       state: present
       update_cache: yes
 
