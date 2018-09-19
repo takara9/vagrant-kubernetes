@@ -10,7 +10,7 @@ Vagrant.configure(2) do |config|
     machine.vm.box = "ubuntu/xenial64"
     machine.vm.hostname = 'node1'
     machine.vm.network :private_network,ip: "172.16.20.12"
-    machine.vm.network :public_network, ip: "192.168.1.92", bridge: "en0: Ethernet"
+    #machine.vm.network :public_network, ip: "192.168.1.92", bridge: "en0: Ethernet"
     machine.vm.provider "virtualbox" do |vbox|
       vbox.gui = false
       vbox.cpus = 1
@@ -23,7 +23,7 @@ Vagrant.configure(2) do |config|
     #
     machine.vm.provision "ansible_local" do |ansible|
       ansible.playbook       = "ansible-playbook/kubernetes.yml"
-      ansible.version        = "2.6.3"
+      ansible.version        = "latest"
       ansible.verbose        = false
       ansible.install        = true
       ansible.limit          = "node1"
@@ -38,7 +38,7 @@ Vagrant.configure(2) do |config|
     machine.vm.box = "ubuntu/xenial64"
     machine.vm.hostname = 'node2'
     machine.vm.network :private_network,ip: "172.16.20.13"
-    machine.vm.network :public_network, ip: "192.168.1.93", bridge: "en0: Ethernet"
+    #machine.vm.network :public_network, ip: "192.168.1.93", bridge: "en0: Ethernet"
     machine.vm.provider "virtualbox" do |vbox|
       vbox.gui = false
       vbox.cpus = 1
@@ -51,7 +51,7 @@ Vagrant.configure(2) do |config|
     #
     machine.vm.provision "ansible_local" do |ansible|
       ansible.playbook       = "ansible-playbook/kubernetes.yml"
-      ansible.version        = "2.6.3"
+      ansible.version        = "latest"
       ansible.verbose        = false
       ansible.install        = true
       ansible.limit          = "node2"
@@ -67,7 +67,7 @@ Vagrant.configure(2) do |config|
     machine.vm.box = "ubuntu/xenial64"
     machine.vm.hostname = 'master'
     machine.vm.network :private_network,ip: "172.16.20.11"
-    machine.vm.network :public_network, ip: "192.168.1.91", bridge: "en0: Ethernet"
+    #machine.vm.network :public_network, ip: "192.168.1.91", bridge: "en0: Ethernet"
     machine.vm.provider "virtualbox" do |vbox|
       vbox.gui = false
       vbox.cpus = 1
@@ -81,7 +81,7 @@ Vagrant.configure(2) do |config|
     #
     machine.vm.provision "ansible_local" do |ansible|
       ansible.playbook       = "ansible-playbook/kubernetes.yml"
-      ansible.version        = "2.6.3"
+      ansible.version        = "latest"
       ansible.verbose        = false
       ansible.install        = true
       ansible.limit          = "master" # or only "nodes" group, etc.
@@ -92,7 +92,7 @@ Vagrant.configure(2) do |config|
     #
     machine.vm.provision "ansible_local" do |ansible|
       ansible.playbook      = "ansible-playbook/k8s_master.yml"
-      ansible.version        = "2.6.3"
+      ansible.version        = "latest"
       ansible.verbose        = false
       ansible.install        = true
       ansible.limit          = "master"
@@ -103,7 +103,7 @@ Vagrant.configure(2) do |config|
     #
     machine.vm.provision "ansible_local" do |ansible|
       ansible.playbook      = "ansible-playbook/k8s_nodes.yml"
-      ansible.version        = "2.6.3"
+      ansible.version        = "latest"
       ansible.verbose        = false
       ansible.install        = true
       ansible.limit          = "nodes"
