@@ -26,7 +26,8 @@
       register: ip
 
     - name: kubeadm init
-      command: kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ ip.stdout_lines[1].split(':')[1].split(' ')[0] }} --service-cidr=10.244.0.0/16
+      #command: kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ ip.stdout_lines[1].split(':')[1].split(' ')[0] }} --service-cidr=10.244.0.0/16
+      command: kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ ip.stdout_lines[1].split(':')[1].split(' ')[0] }} --service-cidr=10.32.0.0/16
       register: join
 
 
