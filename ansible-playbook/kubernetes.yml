@@ -130,14 +130,15 @@
     replace:
       dest: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
       regexp: 'KUBELET_EXTRA_ARGS$'
-      replace: KUBELET_EXTRA_ARGS --node-ip={{ ip.stdout_lines[1].split(':')[1].split(' ')[0] }} --cluster-dns=10.244.0.10
+      replace: KUBELET_EXTRA_ARGS --node-ip={{ ip.stdout_lines[1].split(':')[1].split(' ')[0] }} --cluster-dns=10.32.0.10
+
     when: k8s_minor_ver == "11"
 
   - name: change 10-kubeadm.conf for v1.9 or v1.10
     replace:
       dest: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
       regexp: '^Environment="KUBELET_DNS_ARGS=--cluster-dns=10.96.0.10 --cluster-domain=cluster.local"$'
-      replace: Environment="KUBELET_DNS_ARGS=--cluster-dns=10.244.0.10 --cluster-domain=cluster.local --node-ip={{ ip.stdout_lines[1].split(':')[1].split(' ')[0] }}"
+      replace: Environment="KUBELET_DNS_ARGS=--cluster-dns=10.32.0.10 --cluster-domain=cluster.local --node-ip={{ ip.stdout_lines[1].split(':')[1].split(' ')[0] }}"
     when: (k8s_minor_ver == "10") or (k8s_minor_ver == "9")
 
 

@@ -31,7 +31,7 @@
       replace:
         dest: /var/lib/kubelet/config.yaml
         regexp: '10.96.0.10'
-        replace: 10.244.0.10
+        replace: 10.32.0.10
       when: k8s_minor_ver == "11"
 
     ## kubeletをリスタートして変更を反映
