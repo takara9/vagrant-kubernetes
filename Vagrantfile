@@ -94,7 +94,7 @@ Vagrant.configure(2) do |config|
       ansible.playbook      = "ansible-playbook/k8s_master.yml"
       ansible.version        = "latest"
       ansible.verbose        = false
-      ansible.install        = true
+      ansible.install        = false
       ansible.limit          = "master"
       ansible.inventory_path = "ansible-playbook/hosts"
     end
@@ -105,7 +105,7 @@ Vagrant.configure(2) do |config|
       ansible.playbook      = "ansible-playbook/k8s_nodes.yml"
       ansible.version        = "latest"
       ansible.verbose        = false
-      ansible.install        = true
+      ansible.install        = false
       ansible.limit          = "nodes"
       ansible.inventory_path = "ansible-playbook/hosts"
     end
