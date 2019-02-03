@@ -82,13 +82,24 @@
 
     ## flannelのマニフェストダウンロード
     #
-    - name: download Manifest of Flannel 
+    - name: download Manifest of Flannel for k8s ver <=11
       get_url:
         url: https://raw.githubusercontent.com/coreos/flannel/v0.10.0/Documentation/kube-flannel.yml
         dest: /home/vagrant/
         mode: 0644
         owner: vagrant
         group: vagrant
+      when: k8s_minor_ver|int <= 11
+
+    - name: download Manifest of Flannel for k8s ver > 11
+      get_url:
+        url: https://raw.githubusercontent.com/coreos/flannel/v0.11.0/Documentation/kube-flannel.yml
+        dest: /home/vagrant/
+        mode: 0644
+        owner: vagrant
+        group: vagrant
+      when: k8s_minor_ver|int > 11
+
 
     ## インタフェースの追加
     #
