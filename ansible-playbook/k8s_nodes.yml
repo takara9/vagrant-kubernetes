@@ -12,7 +12,7 @@
     #
     - name: kubeadm reset v1.11 or later
       command: kubeadm reset -f
-      when: k8s_minor_ver == "11"
+      when: k8s_minor_ver|int >= 11
 
     - name: kubeadm reset v1.10 or eary
       command: kubeadm reset
@@ -32,7 +32,7 @@
         dest: /var/lib/kubelet/config.yaml
         regexp: '10.96.0.10'
         replace: 10.32.0.10
-      when: k8s_minor_ver == "11"
+      when: k8s_minor_ver|int >= 11
 
     ## kubeletをリスタートして変更を反映
     #
@@ -41,5 +41,4 @@
         state: restarted
         daemon_reload: yes
         name: kubelet
-      when: k8s_minor_ver == "11"
-
+      when: k8s_minor_ver|int >= 11
