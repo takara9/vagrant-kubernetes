@@ -70,7 +70,7 @@ Vagrant.configure(2) do |config|
     #machine.vm.network :public_network, ip: "192.168.1.91", bridge: "en0: Ethernet"
     machine.vm.provider "virtualbox" do |vbox|
       vbox.gui = false
-      vbox.cpus = 1
+      vbox.cpus = 2
       vbox.memory = 1024
     end
     machine.vm.synced_folder ".", "/vagrant", owner: "vagrant",    
