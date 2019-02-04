@@ -42,3 +42,20 @@
         daemon_reload: yes
         name: kubelet
       when: k8s_minor_ver|int >= 11
+
+    ## Create directory for Persistent Volume hostpath
+    #
+    - name: create hostPath vol1 for each node
+      file: path=/vol1 state=directory owner=root group=root mode=0755
+    - name: create hostPath vol2 for each node
+      file: path=/vol2 state=directory owner=root group=root mode=0755
+    - name: create hostPath vol3 for each node
+      file: path=/vol3 state=directory owner=root group=root mode=0755
+    - name: create hostPath vol4 for each node
+      file: path=/vol4 state=directory owner=root group=root mode=0755
+    - name: create hostPath vol5 for each node
+      file: path=/vol5 state=directory owner=root group=root mode=0755
+    - name: create hostPath vol6 for each node
+      file: path=/vol6 state=directory owner=root group=root mode=0755
+    - name: create hostPath vol7 for each node
+      file: path=/vol7 state=directory owner=root group=root mode=0755
