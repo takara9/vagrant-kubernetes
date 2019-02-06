@@ -1,100 +1,125 @@
 # vagrant-kubernetes
 
+この Vagrant と Ansible のコードは、学習用のマルチノードの Kubernetes 環境を自動構築するためのものです。
+
+vagrant コマンドからクラスタを起動することで、パソコン上に仮想サーバー３台が起動して、Kuberetesの環境を
+自動設定します。起動後は、kubectl コマンドで利用することができます。
+
+1. master 172.16.20.11
+1. node1  172.16.20.12
+1. node2  172.16.20.13
+
+
+## このクラスタを起動するために必要なソフトウェア
+
+このコードを利用するためには、次のソフトウェアをインストールしていなければなりません。
+
+* Vagrant (https://www.vagrantup.com/)
+* VirtualBox (https://www.virtualbox.org/)
+* kubectl (https://kubernetes.io/docs/tasks/tools/install-kubectl/)
+* git (https://kubernetes.io/docs/tasks/tools/install-kubectl/)
+
+## 仮想マシンのホスト環境
+
+Vagrant と VirtualBox が動作するOSが必要です。
+
+* Windows10　
+* MacOS
+* Linux
+
+推奨ハードウェアと言えるか、このコードの筆者の環境は以下のとおりです。
+
+* RAM: 8GB 以上
+* ストレージ: 空き領域 5GB 以上
+* CPU: Intel Core i5 以上
+
 
 ## Kubernetesの起動方法
 
-Ansibleが起動してクラスタのセットアップを実施します。
+起動するためのコマンドは、どのOSでも同じです。 GitHubから、このコードをクローンして、vagrant up するだけです。
+このコマンドの実行中は、仮想サーバーのイメージ、コンテナイメージなど、大量のダウンロードが発生します。
 
 ~~~
-C:\Users\Maho\tmp\git clone https://github.com/takara9/vagrant-kubernetes
-C:\Users\Maho\tmp\vagrant-kubernetes>vagrant up
+git clone https://github.com/takara9/vagrant-kubernetes
+cd vagrant-Kubernetes
+vagrant up
 ~~~
 
+上記のコマンドを実行して、20分程度で、master, node1, node2 の３台の仮想サーバーからなる kubernetes クラスタが起動します。
 
 
-## Windwos10　kubectl の設定方法
+## kubectl の設定方法
 
-マスターノードにログインして操作
+kubectlコマンドで、クラスタを操作する最も簡単な方法は、masterにログインして操作することです。
 
 ~~~
-C:\Users\Maho\tmp\vagrant-kubernetes>vagrant ssh master
-Welcome to Ubuntu 16.04.4 LTS (GNU/Linux 4.4.0-130-generic x86_64)
+vagrant ssh master
 
- * Documentation:  https://help.ubuntu.com
- * Management:     https://landscape.canonical.com
- * Support:        https://ubuntu.com/advantage
-
-  Get cloud support with Ubuntu Advantage Cloud Guest:
-    http://www.ubuntu.com/business/services/cloud
-
-53 packages can be updated.
-20 updates are security updates.
-
-New release '18.04.1 LTS' available.
-Run 'do-release-upgrade' to upgrade to it.
-
-
-Last login: Sun Sep  2 07:44:26 2018 from 10.0.2.2
-vagrant@master:~$ kubectl get node
+kubectl get node
 NAME      STATUS    ROLES     AGE       VERSION
 master    Ready     master    10m       v1.11.2
 node1     Ready     <none>    10m       v1.11.2
 node2     Ready     <none>    10m       v1.11.2
 ~~~
 
+パソコンのOS上からkubectlコマンドを使って、master上のapiserverと連携するには、
+環境変数 KUBECONFIGに、configファイルのパスを設定します。
 
-環境変数 KUBECONFIGにパスを設定する方法
+この config ファイルは、Ansible のプレイブックから、自動生成するようになっており、
+git clone したディレクトの下 kubecconfigに生成されます。
+
+Windows10 の場合は、次のようにして、環境変数をセットすることで、kubectl コマンドが
+masterと繋がるようになります。
 
 ~~~
-C:\Users\Maho\tmp\vagrant-kubernetes>dir
- ドライブ C のボリューム ラベルがありません。
- ボリューム シリアル番号は 26E6-1EC2 です
-
- C:\Users\Maho\tmp\vagrant-kubernetes のディレクトリ
-
-2018/09/02  16:43    <DIR>          .
-2018/09/02  16:43    <DIR>          ..
-2018/09/02  12:06    <DIR>          .vagrant
-2018/09/02  16:42    <DIR>          ansible-playbook
-2018/09/02  12:06               207 ansible.cfg
-2018/09/02  16:43    <DIR>          kubeconfig
-2018/09/02  12:06                21 README.md
-2018/09/02  16:35            46,603 ubuntu-xenial-16.04-cloudimg-console.log
-2018/09/02  16:43            21,400 vag.log
-2018/09/02  16:19             3,821 Vagrantfile
-               5 個のファイル              72,052 バイト
-               5 個のディレクトリ  20,505,161,728 バイトの空き領域
-
 C:\Users\Maho\tmp\vagrant-kubernetes>set KUBECONFIG=%CD%\kubeconfig\config
-
 C:\Users\Maho\tmp\vagrant-kubernetes>kubectl get node
 NAME      STATUS    ROLES     AGE       VERSION
 master    Ready     master    2m        v1.11.2
 node1     Ready     <none>    2m        v1.11.2
-node2     Ready     <none>    2m        v1.11.
+node2     Ready     <none>    2m        v1.11.2
 ~~~
 
-ホームディクレクトリの.kubeに、configをコピーして利用する方法
+Linux / macOS では、git clone で作成されたディレクトリで、次のコマンドを実行します。
+~~~
+$ export KUBECONFIG=`pwd`/kubeconfig/config
+$ kubectl get node
+NAME      STATUS    ROLES     AGE       VERSION
+master    Ready     master    2m        v1.11.2
+node1     Ready     <none>    2m        v1.11.2
+node2     Ready     <none>    2m        v1.11.2
+~~~
+
+
+ホームディクレクトリの.kubeに、configをコピーして利用することで、環境変数 KUBECOFIG を
+設定しなくても、kubectl が動作するようになります。
 
 ~~~
-C:\Users\Maho\tmp\vagrant-kubernetes\kubeconfig>dir
- ドライブ C のボリューム ラベルがありません。
- ボリューム シリアル番号は 26E6-1EC2 です
-
- C:\Users\Maho\tmp\vagrant-kubernetes\kubeconfig のディレクトリ
-
-2018/09/02  16:43    <DIR>          .
-2018/09/02  16:43    <DIR>          ..
-2018/09/02  16:43             5,448 config
-               1 個のファイル               5,448 バイト
-               2 個のディレクトリ  20,502,401,024 バイトの空き領域
-
 C:\Users\Maho\tmp\vagrant-kubernetes\kubeconfig>copy config C:\Users\Maho\.kube\
         1 個のファイルをコピーしました。
-
-C:\Users\Maho\tmp\vagrant-kubernetes\kubeconfig>kubectl get node
-NAME      STATUS    ROLES     AGE       VERSION
-master    Ready     master    8m        v1.11.2
-node1     Ready     <none>    8m        v1.11.2
-node2     Ready     <none>    8m        v1.11.2
 ~~~
+
+Linux / macOSでは、cp コマンドを使います。一度、kubectl コマンドを実行すれば、
+ホームディレクトリに、.kube/configが作成されているので、コピーだけすれば良いです。
+
+## Kubernetes クラスタの停止
+
+クラスタの仮想サーバーをシャットダウンするには、次のコマンドを利用します。
+再び起動するには、vagrant up で開始します。
+
+~~~
+vagrant halt
+~~~
+
+
+## Kubernetes クラスタの削除
+
+仮想サーバーの環境を削除するには、次のコマンドを実行します。
+これを実行した場合、仮想サーバーに加えた変更は、すべて消去されます。
+
+~~~
+vagrant destroy
+~~~
+
+
+以上です。
