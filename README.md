@@ -4,6 +4,8 @@
 
 ## このクラスタを起動するために必要なソフトウェア
 
+このコードを利用するためには、次のソフトウェアをインストールしていなければなりません。
+
 * Vagrant (https://www.vagrantup.com/)
 * VirtualBox (https://www.virtualbox.org/)
 * kubectl (https://kubernetes.io/docs/tasks/tools/install-kubectl/)
@@ -11,7 +13,7 @@
 
 ## 仮想マシンのホスト環境
 
-Vagrant と　VirtualBoxが動作するOSが必要です。
+Vagrant と VirtualBox が動作するOSが必要です。
 
 * Windows10　
 * MacOS
@@ -27,6 +29,7 @@ Vagrant と　VirtualBoxが動作するOSが必要です。
 ## Kubernetesの起動方法
 
 起動するためのコマンドは、どのOSでも同じです。 GitHubから、このコードをクローンして、vagrant up するだけです。
+このコマンドの実行中は、仮想サーバーのイメージ、コンテナイメージなど、大量のダウンロードが発生します。
 
 ~~~
 git clone https://github.com/takara9/vagrant-kubernetes
@@ -37,12 +40,7 @@ vagrant up
 上記のコマンドを実行して、20分程度で、master, node1, node2 の３台の仮想サーバーからなる kubernetes クラスタが起動します。
 
 
-## kubectl の実行方法
-
-セットアップ作業無しに、
-
-
-## Windwos10　kubectl の設定方法
+## kubectl の設定方法
 
 kubectlコマンドで、クラスタを操作する最も簡単な方法は、masterにログインして操作することです。
 
