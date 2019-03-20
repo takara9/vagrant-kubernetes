@@ -3,7 +3,8 @@
 #k8s_version: =1.10.3-00
 #k8s_version: =1.11.2-00
 #k8s_version: =1.12.5-00
-k8s_version: =1.13.2-00
+#k8s_version: =1.13.2-00
+k8s_version: =1.14.0-rc.1
 
 # Docker Package Version
 docker_version: =18.06.1~ce~3-0~ubuntu
