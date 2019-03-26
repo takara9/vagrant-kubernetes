@@ -40,31 +40,44 @@ Vagrant と VirtualBox が動作するOSが必要です。
 
 ## Kubernetesの起動方法
 
-起動するためのコマンドは、どのOSでも同じです。 GitHubから、このコードをクローンして、vagrant up するだけです。
-このコマンドの実行中は、仮想サーバーのイメージ、コンテナイメージなど、大量のダウンロードが発生します。
+起動するためのコマンドは、どのOSでも同じです。 GitHubから、このコードをクローンして、vagrant up するだけです。このコマンドの実行中は、仮想サーバーのイメージ、コンテナイメージなど、大量のダウンロードが発生します。
+
+
 
 ~~~
-git clone https://github.com/takara9/vagrant-kubernetes
+git clone -b 1.14 https://github.com/takara9/vagrant-kubernetes
 cd vagrant-Kubernetes
 vagrant up
 ~~~
 
 上記のコマンドを実行して、20分程度で、master, node1, node2 の３台の仮想サーバーからなる kubernetes クラスタが起動します。
 
+~~~
+$ export KUBECONFIG=`pwd`/kubeconfig/config
+
+$ kubectl get node
+NAME     STATUS   ROLES    AGE    VERSION
+master   Ready    master   103s   v1.14.0
+node1    Ready    <none>   67s    v1.14.0
+node2    Ready    <none>   80s    v1.14.0
+
+$ kubectl version --short
+Client Version: v1.13.1
+Server Version: v1.14.0
+
+$ kubectl get componentstatus
+NAME                 STATUS    MESSAGE             ERROR
+scheduler            Healthy   ok                  
+controller-manager   Healthy   ok                  
+etcd-0               Healthy   {"health":"true"}   
+
+$ kubectl cluster-info
+Kubernetes master is running at https://172.16.20.11:6443
+KubeDNS is running at https://172.16.20.11:6443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
+~~~
+
 
 ## kubectl の設定方法
-
-kubectlコマンドで、クラスタを操作する最も簡単な方法は、masterにログインして操作することです。
-
-~~~
-vagrant ssh master
-
-kubectl get node
-NAME      STATUS    ROLES     AGE       VERSION
-master    Ready     master    10m       v1.14.x
-node1     Ready     <none>    10m       v1.14.x
-node2     Ready     <none>    10m       v1.14.x
-~~~
 
 パソコンのOS上からkubectlコマンドを使って、master上のapiserverと連携するには、
 環境変数 KUBECONFIGに、configファイルのパスを設定します。
@@ -78,22 +91,21 @@ masterと繋がるようになります。
 ~~~
 C:\Users\Maho\tmp\vagrant-kubernetes>set KUBECONFIG=%CD%\kubeconfig\config
 C:\Users\Maho\tmp\vagrant-kubernetes>kubectl get node
-NAME      STATUS    ROLES     AGE       VERSION
-master    Ready     master    2m        v1.13.2
-node1     Ready     <none>    2m        v1.13.2
-node2     Ready     <none>    2m        v1.13.2
+NAME     STATUS   ROLES    AGE   VERSION
+master   Ready    master   35m   v1.14.0
+node1    Ready    <none>   35m   v1.14.0
+node2    Ready    <none>   35m   v1.14.0
 ~~~
 
 Linux / macOS では、git clone で作成されたディレクトリで、次のコマンドを実行します。
 ~~~
 $ export KUBECONFIG=`pwd`/kubeconfig/config
 $ kubectl get node
-NAME      STATUS    ROLES     AGE       VERSION
-master    Ready     master    2m        v1.13.2
-node1     Ready     <none>    2m        v1.13.2
-node2     Ready     <none>    2m        v1.13.2
+NAME     STATUS   ROLES    AGE   VERSION
+master   Ready    master   36m   v1.14.0
+node1    Ready    <none>   35m   v1.14.0
+node2    Ready    <none>   36m   v1.14.0
 ~~~
-
 
 ホームディクレクトリの.kubeに、configをコピーして利用することで、環境変数 KUBECOFIG を
 設定しなくても、kubectl が動作するようになります。
@@ -105,6 +117,8 @@ C:\Users\Maho\tmp\vagrant-kubernetes\kubeconfig>copy config C:\Users\Maho\.kube\
 
 Linux / macOSでは、cp コマンドを使います。一度、kubectl コマンドを実行すれば、
 ホームディレクトリに、.kube/configが作成されているので、コピーだけすれば良いです。
+
+
 
 ## Kubernetes クラスタの停止
 
@@ -122,7 +136,7 @@ vagrant halt
 これを実行した場合、仮想サーバーに加えた変更は、すべて消去されます。
 
 ~~~
-vagrant destroy
+vagrant destroy -f
 ~~~
 
 
