@@ -30,11 +30,23 @@
       register: join
 
 
+    #- debug : msg="{{ join.stdout_lines }}"
+
+
     ## k8sノード用コマンドを保存
     #
     - name: rm "{{ join_cmd }}"
       command: rm -f {{ join_cmd }}
-    - shell: echo "join_command" ":" {{ join.stdout_lines[-1] }} > {{ join_cmd }}
+
+
+    - name: kubeadm < 1.13
+      shell: echo "join_command" ":" {{ join.stdout_lines[-1] }} > {{ join_cmd }}
+      when: k8s_minor_ver|int < 14
+
+
+    - name: kubeadm >= 1.14
+      shell: echo "join_command" ":" {{ join.stdout_lines[-2] }} {{ join.stdout_lines[-1] }} > {{ join_cmd }}
+      when: k8s_minor_ver|int >= 14
 
 
     ## kubeletのDNSのIPアドレスを変更
