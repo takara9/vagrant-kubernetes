@@ -2,10 +2,6 @@
 
 この Vagrant と Ansible のコードは、学習用のマルチノードの Kubernetes 環境を自動構築するためのものです。
 
-
-=== version 1.14 に対応するために作成中 ===
-
-
 vagrant コマンドからクラスタを起動することで、パソコン上に仮想サーバー３台が起動して、Kuberetesの環境を
 自動設定します。起動後は、kubectl コマンドで利用することができます。
 
@@ -43,7 +39,6 @@ Vagrant と VirtualBox が動作するOSが必要です。
 起動するためのコマンドは、どのOSでも同じです。 GitHubから、このコードをクローンして、vagrant up するだけです。このコマンドの実行中は、仮想サーバーのイメージ、コンテナイメージなど、大量のダウンロードが発生します。
 
 
-
 ~~~
 git clone -b 1.14 https://github.com/takara9/vagrant-kubernetes
 cd vagrant-Kubernetes
@@ -53,7 +48,8 @@ vagrant up
 上記のコマンドを実行して、20分程度で、master, node1, node2 の３台の仮想サーバーからなる kubernetes クラスタが起動します。
 
 ~~~
-$ export KUBECONFIG=`pwd`/kubeconfig/config
+$ vagrant ssh master
+<中略>
 
 $ kubectl get node
 NAME     STATUS   ROLES    AGE    VERSION
@@ -62,7 +58,7 @@ node1    Ready    <none>   67s    v1.14.0
 node2    Ready    <none>   80s    v1.14.0
 
 $ kubectl version --short
-Client Version: v1.13.1
+Client Version: v1.14.0
 Server Version: v1.14.0
 
 $ kubectl get componentstatus
