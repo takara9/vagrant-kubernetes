@@ -35,9 +35,9 @@
 
     ## k8sノード用コマンドを保存
     #
-    - name: rm "{{ join_cmd }}"
-      command: rm -f {{ join_cmd }}
-
+    - file:
+        path: "{{ join_cmd }}"
+        state: absent
 
     - name: kubeadm < 1.13
       shell: echo "join_command" ":" {{ join.stdout_lines[-1] }} > {{ join_cmd }}
@@ -74,22 +74,41 @@
         state: directory
         owner: vagrant
         group: vagrant
-        mode:  0755
+        mode:  '0755'
+
+    - name: mkdir /vagrant/kubeconfig
+      file:
+        path:  /vagrant/kubeconfig
+        state: directory
+        owner: vagrant
+        group: vagrant
+        mode:  '0755'
+
 
     ##  configファイルのコピー
     #
-    #- name: copy config
-    #  copy:
-    #    src:  /etc/kubernetes/admin.conf
-    #    dest: /home/vagrant/.kube/config
-    #    owner: root
-    #    group: root
-    #    mode:  0644
-    - shell: cp /etc/kubernetes/admin.conf /home/vagrant/.kube/config
-    - shell: chown vagrant:vagrant /home/vagrant/.kube/config
-    - shell: chmod 0600 /home/vagrant/.kube/config
-    - shell: rm -fr /vagrant/kubeconfig
-    - shell: cp -fr /home/vagrant/.kube /vagrant/kubeconfig
+    - name: chmod admin.conf
+      file:
+        path:  /etc/kubernetes/admin.conf
+        owner: vagrant
+        group: vagrant
+        mode:  '0600'
+    
+    - name: copy config to home dir
+      copy:
+        src:  /etc/kubernetes/admin.conf
+        dest: /home/vagrant/.kube/config
+        owner: vagrant
+        group: vagrant
+        mode:  '0600'
+
+    - name: copy config to host dir
+      copy:
+        src:  /etc/kubernetes/admin.conf
+        dest: /vagrant/kubeconfig/config
+        owner: vagrant
+        group: vagrant
+        mode:  '0600'
 
 
     ## flannelのマニフェストダウンロード
@@ -98,7 +117,7 @@
       get_url:
         url: https://raw.githubusercontent.com/coreos/flannel/v0.10.0/Documentation/kube-flannel.yml
         dest: /home/vagrant/
-        mode: 0644
+        mode: '0644'
         owner: vagrant
         group: vagrant
       when: k8s_minor_ver|int <= 11
@@ -107,7 +126,7 @@
       get_url:
         url: https://raw.githubusercontent.com/coreos/flannel/v0.11.0/Documentation/kube-flannel.yml
         dest: /home/vagrant/
-        mode: 0644
+        mode: '0644'
         owner: vagrant
         group: vagrant
       when: k8s_minor_ver|int > 11
