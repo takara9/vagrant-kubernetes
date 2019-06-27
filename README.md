@@ -91,20 +91,20 @@ masterと繋がるようになります。
 ~~~
 C:\Users\Maho\tmp\vagrant-kubernetes>set KUBECONFIG=%CD%\kubeconfig\config
 C:\Users\Maho\tmp\vagrant-kubernetes>kubectl get node
-NAME     STATUS   ROLES    AGE   VERSION
-master   Ready    master   35m   v1.14.3
-node1    Ready    <none>   35m   v1.14.3
-node2    Ready    <none>   35m   v1.14.3
+NAME     STATUS   ROLES    AGE     VERSION
+master   Ready    master   9m13s   v1.15.0
+node1    Ready    <none>   7m49s   v1.15.0
+node2    Ready    <none>   7m48s   v1.15.0
 ~~~
 
 Linux / macOS では、git clone で作成されたディレクトリで、次のコマンドを実行します。
 ~~~
-imac:k8s_v1.14 maho$ export KUBECONFIG=`pwd`/kubeconfig/config
-imac:k8s_v1.14 maho$ kubectl get node
-NAME     STATUS   ROLES    AGE   VERSION
-master   Ready    master   98s   v1.14.3
-node1    Ready    <none>   76s   v1.14.3
-node2    Ready    <none>   63s   v1.14.3
+imac:k8s_v1.15 maho$ export KUBECONFIG=`pwd`/kubeconfig/config
+imac:k8s_v1.15 maho$ kubectl get node
+NAME     STATUS   ROLES    AGE     VERSION
+master   Ready    master   6m14s   v1.15.0
+node1    Ready    <none>   4m50s   v1.15.0
+node2    Ready    <none>   4m49s   v1.15.0
 ~~~
 
 ホームディクレクトリの.kubeに、configをコピーして利用することで、環境変数 KUBECOFIG を
