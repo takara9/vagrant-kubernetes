@@ -1,7 +1,7 @@
 # Kubernetes Package Version
 #k8s_version: =1.9.6-00
 #k8s_version: =1.10.3-00
-k8s_version: =1.11.2-00
+k8s_version: =1.11.10-00
 
 # Docker Package Version
 docker_version: =17.12.1~ce-0~ubuntu
