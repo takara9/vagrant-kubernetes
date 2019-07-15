@@ -2,7 +2,7 @@
 #k8s_version: =1.9.6-00
 #k8s_version: =1.10.3-00
 #k8s_version: =1.11.2-00
-k8s_version: =1.12.5-00
+k8s_version: =1.12.10-00
 #k8s_version: =1.13.2-00
 
 # Docker Package Version
