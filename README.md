@@ -52,25 +52,28 @@ $ vagrant up
 $ vagrant ssh master
 
 $ kubectl get node
-NAME     STATUS   ROLES    AGE     VERSION
-master   Ready    master   6m14s   v1.15.0
-node1    Ready    <none>   4m50s   v1.15.0
-node2    Ready    <none>   4m49s   v1.15.0
-
+NAME     STATUS   ROLES    AGE   VERSION
+master   Ready    master   10m   v1.16.0
+node1    Ready    <none>   10m   v1.16.0
+node2    Ready    <none>   10m   v1.16.0
 
 $ kubectl version --short
-Client Version: v1.15.0
-Server Version: v1.15.0
+Client Version: v1.16.0
+Server Version: v1.16.0
 
+# 1.16 の kubectlは次のコマンドが動かない様です。バージョン 1.15 のkubeclt を利用すると表示されます。
 $ kubectl get componentstatus
-NAME                 STATUS    MESSAGE             ERROR
-scheduler            Healthy   ok                  
-controller-manager   Healthy   ok                  
-etcd-0               Healthy   {"health":"true"}   
+NAME                 AGE
+scheduler            <unknown>
+controller-manager   <unknown>
+etcd-0               <unknown>
+
 
 $ kubectl cluster-info
 Kubernetes master is running at https://172.16.20.11:6443
 KubeDNS is running at https://172.16.20.11:6443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
+
+To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
 ~~~
 
 
@@ -88,20 +91,20 @@ masterと繋がるようになります。
 ~~~
 C:\Users\Maho\tmp\vagrant-kubernetes>set KUBECONFIG=%CD%\kubeconfig\config
 C:\Users\Maho\tmp\vagrant-kubernetes>kubectl get node
-NAME     STATUS   ROLES    AGE     VERSION
-master   Ready    master   9m13s   v1.15.0
-node1    Ready    <none>   7m49s   v1.15.0
-node2    Ready    <none>   7m48s   v1.15.0
+NAME     STATUS   ROLES    AGE   VERSION
+master   Ready    master   25m   v1.16.0
+node1    Ready    <none>   24m   v1.16.0
+node2    Ready    <none>   24m   v1.16.0
 ~~~
 
 Linux / macOS では、git clone で作成されたディレクトリで、次のコマンドを実行します。
 ~~~
-imac:k8s_v1.15 maho$ export KUBECONFIG=`pwd`/kubeconfig/config
-imac:k8s_v1.15 maho$ kubectl get node
-NAME     STATUS   ROLES    AGE     VERSION
-master   Ready    master   6m14s   v1.15.0
-node1    Ready    <none>   4m50s   v1.15.0
-node2    Ready    <none>   4m49s   v1.15.0
+imac:k8s_v1.16 maho$ export KUBECONFIG=`pwd`/kubeconfig/config
+imac:k8s_v1.16 maho$ kubectl get node
+NAME     STATUS   ROLES    AGE   VERSION
+master   Ready    master   25m   v1.16.0
+node1    Ready    <none>   24m   v1.16.0
+node2    Ready    <none>   24m   v1.16.0
 ~~~
 
 ホームディクレクトリの.kubeに、configをコピーして利用することで、環境変数 KUBECOFIG を
