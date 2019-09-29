@@ -62,6 +62,7 @@ Client Version: v1.16.0
 Server Version: v1.16.0
 
 # 1.16 の kubectlは次のコマンドが動かない様です。バージョン 1.15 のkubeclt を利用すると表示されます。
+# https://discuss.kubernetes.io/t/component-status-showing-unknown-in-a-multi-master-cluster/8034
 $ kubectl get componentstatus
 NAME                 AGE
 scheduler            <unknown>
