@@ -12,7 +12,7 @@
     ## k8sマスタを初期化
     #
     - name: "kubeadm reset v1.11 or later"
-      command: kubeadm reset -f
+      command: kubeadm reset -f 
       when: k8s_minor_ver|int >= 11
 
     - name: "kubeadm reset v1.10 or eary"
@@ -28,7 +28,6 @@
     - name: kubeadm init
       command: kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ ip.stdout_lines[1].split(':')[1].split(' ')[0] }} --service-cidr=10.32.0.0/24
       register: join
-
 
     ## k8sノード用コマンドを保存
     #
@@ -91,9 +90,11 @@
         group: vagrant
       when: k8s_minor_ver|int <= 11
 
-    - name: download Manifest of Flannel for k8s ver > 11
+     ## v0.11.0のkube-flannel.ymlは、arm,ppc,s390などを含む複合マニフェストのため、amd64だけのものを作成
+     - name: download Manifest of Flannel for k8s ver > 11
       get_url:
-        url: https://raw.githubusercontent.com/coreos/flannel/v0.11.0/Documentation/kube-flannel.yml
+        #url: https://raw.githubusercontent.com/coreos/flannel/v0.11.0/Documentation/kube-flannel.yml
+        url: https://raw.githubusercontent.com/takara9/vagrant-kubernetes/1.12/kube-flannel.yml
         dest: /home/vagrant/
         mode: 0644
         owner: vagrant
