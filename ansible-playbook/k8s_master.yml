@@ -153,4 +153,25 @@
     - name: Deploy Flannel 
       become_user: vagrant
       command: kubectl apply -f /home/vagrant/kube-flannel.yml
-      
+
+
+    ## Metrics Server インストール
+    - name: Install Metrics Server
+      git:
+        repo: 'https://github.com/kubernetes-sigs/metrics-server'
+        dest: /home/vagrant/metrics-server
+
+    - name: add a new line
+      blockinfile:
+        dest: /home/vagrant/metrics-server/deploy/1.8+/metrics-server-deployment.yaml
+        insertafter: '        args:'
+        content: '          - --kubelet-insecure-tls'
+
+      blockinfile:
+        dest: /home/vagrant/metrics-server/deploy/1.8+/metrics-server-deployment.yaml
+        insertafter: '        args:'
+        content: '          - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname'
+
+    - name: Deploy Metrics Server
+      become_user: vagrant
+      command: kubectl apply -f /home/vagrant/metrics-server/deploy/1.8+
