@@ -165,12 +165,10 @@
       blockinfile:
         path: /home/vagrant/metrics-server/deploy/1.8+/metrics-server-deployment.yaml
         insertafter: '        args:'
-        content: '          - --kubelet-insecure-tls'
-
-      blockinfile:
-        path: /home/vagrant/metrics-server/deploy/1.8+/metrics-server-deployment.yaml
-        insertafter: '          - --cert-dir=/tmp'
-        content: '          - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname'
+        block: |
+           # added lines
+                     - --kubelet-insecure-tls
+                     - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
 
     - name: Deploy Metrics Server
       become_user: vagrant
