@@ -145,7 +145,7 @@
     - name: add a new line
       blockinfile:
         path: /home/vagrant/kube-flannel.yml
-	marker: "beta.kubernetes.io/arch: amd64"
+        marker: "beta.kubernetes.io/arch: amd64"
         insertafter: '--kube-subnet-mgr$'
         content: '        - --iface=enp0s8'
 
