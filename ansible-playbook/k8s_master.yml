@@ -166,8 +166,8 @@
         path: /home/vagrant/metrics-server/deploy/1.8+/metrics-server-deployment.yaml
         insertafter: '        args:'
         content: |
-          - --kubelet-insecure-tls
-          - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
+          "          - --kubelet-insecure-tls"
+          "          - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname"
 
     - name: Deploy Metrics Server
       become_user: vagrant
