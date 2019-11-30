@@ -193,7 +193,7 @@
         regexp: 'kubernetes-dashboard'
         replace: 'cluster-admin'
 
-    - name: Deploy Dashboard UI
-      become_user: vagrant
-      command: kubectl apply -f /home/vagrant/recommended.yaml
+    #- name: Deploy Dashboard UI
+    #  become_user: vagrant
+    #  command: kubectl apply -f /home/vagrant/recommended.yaml
       
