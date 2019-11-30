@@ -190,8 +190,8 @@
       replace:
         path: /home/vagrant/recommended.yaml
         after: '  kind: ClusterRole'
-        regexp: 'kubernetes-dashboard'
-        replace: 'cluster-admin'
+        regexp: '^  name: kubernetes-dashboard'
+        replace: '  name: cluster-admin'
 
     #- name: Deploy Dashboard UI
     #  become_user: vagrant
