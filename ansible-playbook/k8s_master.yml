@@ -156,6 +156,7 @@
 
 
     ## Metrics Server インストール
+    #
     - name: Install Metrics Server
       git:
         repo: 'https://github.com/kubernetes-sigs/metrics-server'
@@ -173,3 +174,26 @@
     - name: Deploy Metrics Server
       become_user: vagrant
       command: kubectl apply -f /home/vagrant/metrics-server/deploy/1.8+
+
+
+    ## Dashboard UI インストール
+    #
+    - name: Download Dashboard Manifest
+      get_url:
+        url: https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta6/aio/deploy/recommended.yaml
+        dest: /home/vagrant/
+        mode: '0644'
+        owner: vagrant
+        group: vagrant
+
+    - name: Change Dashboard RBAC
+      replace:
+        path: /home/vagrant/recommended.yaml
+        after: '  kind: ClusterRole'
+        regexp: 'kubernetes-dashboard'
+        replace: 'cluster-admin'
+
+    - name: Deploy Dashboard UI
+      become_user: vagrant
+      command: kubectl apply -f /home/vagrant/recommended.yaml
+      
