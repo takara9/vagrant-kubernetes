@@ -136,4 +136,28 @@ vagrant destroy -f
 ~~~
 
 
+# Kuberntes DashBoard UI の起動方法
+
+このコンフィグレーションでは、オプション扱いとなっている Metrics server と Dashboard を起動しています。
+
+Dashboardにアクセスするには、パソコンのOSからアクセスできるように設定しておき、プロキシを起動してください。
+ただし、このプロキシを止めるには、Ctrl-Cが必要です。
+
+~~~
+$ export KUBECONFIG=`pwd`/kubeconfig/config
+$ kubectl proxy
+~~~
+
+そして、パソコンのブラウザから次のURLをアクセスします。
+
+http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
+
+ブラウザには、Kubernetes Dashboard の認証画面が表示されます。そこでKubeconfigを選んで、kubeconfigのファイルとして、
+$KUBECONFIG にセットしたパスのファイルを選択します。そして、「サインイン」ボタンをクリックします。
+
+これで、Kubernetes Dashboard のトップ画面が表示されます。
+
+
+
+
 以上です。
