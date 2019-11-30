@@ -198,6 +198,7 @@
       command: kubectl apply -f /home/vagrant/recommended.yaml
 
     - name: setup kubeconfig
+      become_user: vagrant    
       shell: |
         TOKEN=$(kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret |grep kubernetes-dashboard-token-* | awk '{print $1}') |awk '$1=="token:"{print $2}')
         kubectl config set-credentials kubernetes-admin --token="${TOKEN}"
