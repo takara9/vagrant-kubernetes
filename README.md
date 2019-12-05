@@ -2,6 +2,10 @@
 
 この Vagrant と Ansible のコードは、学習用のマルチノードの Kubernetes 環境を自動構築するためのものです。
 
+起動の様子をYouTubeに登録しましたので、実施前にイメージを掴んて頂けると思います。
+https://www.youtube.com/watch?v=ajU5iwy4-eg
+
+
 vagrant コマンドからクラスタを起動することで、パソコン上に仮想サーバー３台が起動して、Kuberetesの環境を
 自動設定します。起動後は、kubectl コマンドで利用することができます。
 
