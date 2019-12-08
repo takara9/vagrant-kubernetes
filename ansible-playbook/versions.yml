@@ -1,3 +1,7 @@
+# Container_Engine
+container_engine: docker-ce
+#container_engine: containerd
+
 # Kubernetes Package Version
 #k8s_version: =1.9.6-00
 #k8s_version: =1.10.3-00
@@ -10,9 +14,10 @@
 k8s_version: =1.16.3-00
 
 # Docker Package Version
-#docker_version: =18.06.1~ce~3-0~ubuntu
-#docker_version: =17.12.1~ce-0~ubuntu
-#docker_version: =17.03.2~ce-0~ubuntu-xenial
+docker_version: =18.06.1~ce~3-0~ubuntu
+
+# Containerd version
+containerd_version: =1.2.4
 
 
 # K8s Minor Number
