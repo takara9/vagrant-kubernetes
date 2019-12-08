@@ -1,6 +1,6 @@
 # vagrant-kubernetes
 
-この Vagrant と Ansible のコードは、学習用のマルチノードの Kubernetes 環境を自動構築するためのものです。
+この Vagrant と Ansible のコードは、学習用のマルチノードの Kubernetes 環境を自動構築するためのものです。起動の様子をYouTubeに登録しましたので、実施前にイメージを掴んて頂けると思います。 https://www.youtube.com/watch?v=ajU5iwy4-eg
 
 vagrant コマンドからクラスタを起動することで、パソコン上に仮想サーバー３台が起動して、Kuberetesの環境を
 自動設定します。起動後は、kubectl コマンドで利用することができます。
@@ -51,31 +51,33 @@ $ vagrant up
 ~~~
 $ vagrant ssh master
 
-$ kubectl get node
+vagrant@master:~$ kubectl get node
 NAME     STATUS   ROLES    AGE   VERSION
-master   Ready    master   10m   v1.16.0
-node1    Ready    <none>   10m   v1.16.0
-node2    Ready    <none>   10m   v1.16.0
+master   Ready    master   98s   v1.16.3
+node1    Ready    <none>   56s   v1.16.3
+node2    Ready    <none>   62s   v1.16.3
 
-$ kubectl version --short
-Client Version: v1.16.0
-Server Version: v1.16.0
+vagrant@master:~$ kubectl version --short
+Client Version: v1.16.3
+Server Version: v1.16.3
 
-# 1.16 の kubectlは次のコマンドが動かない様です。バージョン 1.15 のkubeclt を利用すると表示されます。
-# https://discuss.kubernetes.io/t/component-status-showing-unknown-in-a-multi-master-cluster/8034
-$ kubectl get componentstatus
+vagrant@master:~$ kubectl get componentstatus
 NAME                 AGE
-scheduler            <unknown>
 controller-manager   <unknown>
+scheduler            <unknown>
 etcd-0               <unknown>
 
-
-$ kubectl cluster-info
+vagrant@master:~$ kubectl cluster-info
 Kubernetes master is running at https://172.16.20.11:6443
 KubeDNS is running at https://172.16.20.11:6443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
+Metrics-server is running at https://172.16.20.11:6443/api/v1/namespaces/kube-system/services/https:metrics-server:/proxy
 
 To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
+
 ~~~
+
+1.16 の kubectlは次のコマンドでは componentstatus が動かない様です。バージョン 1.15 のkubeclt を利用すると表示されます。参考URL https://discuss.kubernetes.io/t/component-status-showing-unknown-in-a-multi-master-cluster/8034
+
 
 
 ## kubectl の設定方法
@@ -139,6 +141,26 @@ vagrant halt
 ~~~
 vagrant destroy -f
 ~~~
+
+
+# Kuberntes DashBoard UI の起動方法
+
+このコンフィグレーションでは、オプション扱いとなっている Metrics server と Dashboard を起動しています。
+
+Dashboardにアクセスするには、パソコンのOSからアクセスできるように設定しておき、プロキシを起動してください。
+ただし、このプロキシを止めるには、Ctrl-Cが必要です。
+
+~~~
+$ export KUBECONFIG=`pwd`/kubeconfig/config
+$ kubectl proxy
+~~~
+
+そして、パソコンのブラウザから次のURLをアクセスします。
+
+http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/
+
+ブラウザには、Kubernetes Dashboard の認証画面が表示されます。そこでKubeconfigを選んで、kubeconfigのファイルとして、$KUBECONFIG にセットしたパスのファイルを選択します。そして、「サインイン」ボタンをクリックします。これで、Kubernetes Dashboard のトップ画面が表示されます。
+
 
 
 以上です。
