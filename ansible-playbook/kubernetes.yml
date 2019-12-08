@@ -9,17 +9,8 @@
 
   - debug: var=k8s_minor_ver
 
-
-  ## Docker CE のインストール
-  #
-  - name: Add Docker GPG key
-    apt_key: url=https://download.docker.com/linux/ubuntu/gpg
-
-  - name: Add Docker APT repository
-    apt_repository:
-      repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ansible_distribution_release}} stable
-
-  - name: Install a list of packages
+  ## Containerd のインストール
+  - name: Install the prerequisite packeage
     apt:
       name: "{{ packages }}"
       state: present
@@ -31,16 +22,27 @@
       - curl
       - software-properties-common
       - nfs-common
-      - docker-ce{{ docker_version }}
+      - libseccomp2
 
-  - name: usermod -aG docker vagrant
-    user:
-      name: vagrant
-      groups: docker
+  - name: Add the br_netfilter module
+    modprobe:
+      name: br_netfilter
+      state: present
+
+  - name: Download Containerd
+    get_url:
+      url: https://storage.googleapis.com/cri-containerd-release/cri-containerd-1.2.4.linux-amd64.tar.gz
+      dest: /tmp/cri-containerd-1.2.4.linux-amd64.tar.gz
+      mode: '0644'
+
+  - name: Deploy Containerd
+    unarchive:
+      src: /tmp/cri-containerd-1.2.4.linux-amd64.tar.gz
+      dest: /
+
 
   ## カーネル設定変更
-  #
-  - name: Set sysctl 
+  - name: Set sysctl bridge
     sysctl:
       name: net.bridge.bridge-nf-call-iptables
       value: "1"
@@ -48,6 +50,23 @@
       sysctl_file: /etc/sysctl.conf      
       state: present
       reload: yes
+
+  - name: Set sysctl ip_forward
+    sysctl:
+      name: net.ipv4.ip_forward
+      value: "1"
+      sysctl_set: yes
+      sysctl_file: /etc/sysctl.conf      
+      state: present
+      reload: yes
+
+
+  - name: Containerd start by systemd
+    systemd:
+      state: started
+      daemon_reload: yes
+      name: containerd
+
 
   ## GlusterFS のインストール
   #
@@ -94,15 +113,23 @@
       update_cache: yes
 
 
+  # Containerd のコンフィグ・ファイルをコピー
+  - name: Copy containerd configfile
+    copy:
+      src: containerd_conf
+      dest: /etc/systemd/system/kubelet.service.d/0-containerd.conf
+      mode: '0644'
+
+
   ## k8sのVagrant対応に、ノードのIPアドレスを設定 
   #
-  - name: include vars
+  - name: Set value to local vars
     include_vars: /vagrant/ansible-playbook/versions.yml
 
 
   ## HostOnly Interface の IPアドレス取得
   #
-  - name: getting hostonly ip address
+  - name: get IP-addr for hostonly interface
     command: ifconfig enp0s8
     register: ip
   - debug: var=ip.stdout_lines[1].split(':')[1].split(' ')[0]
@@ -111,20 +138,11 @@
 
   ## 10-kubeadmin.conf に --node-ipを追加
   #
-  - name: change 10-kubeadm.conf for v1.11 or later
+  - name: Change 10-kubeadm.conf
     replace:
       dest: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
       regexp: 'KUBELET_EXTRA_ARGS$'
       replace: KUBELET_EXTRA_ARGS --node-ip={{ ip.stdout_lines[1].split(':')[1].split(' ')[0] }} --cluster-dns=10.32.0.10
-
-    when: k8s_minor_ver |int > 11
-
-  - name: change 10-kubeadm.conf for v1.9 or v1.10
-    replace:
-      dest: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
-      regexp: '^Environment="KUBELET_DNS_ARGS=--cluster-dns=10.96.0.10 --cluster-domain=cluster.local"$'
-      replace: Environment="KUBELET_DNS_ARGS=--cluster-dns=10.32.0.10 --cluster-domain=cluster.local --node-ip={{ ip.stdout_lines[1].split(':')[1].split(' ')[0] }}"
-    when: (k8s_minor_ver == "10") or (k8s_minor_ver == "9")
 
 
   ## 変更を反映
