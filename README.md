@@ -39,7 +39,6 @@ Vagrant と VirtualBox が動作するOSが必要です。
 起動するためのコマンドは、どのOSでも同じです。 GitHubから、このコードをクローンして、vagrant up するだけです。このコマンドの実行中は、仮想サーバーのイメージ、コンテナイメージなど、大量のダウンロードが発生します。
 
 
-
 ~~~
 $ git clone -b 1.15 https://github.com/takara9/vagrant-kubernetes
 $ cd vagrant-Kubernetes
@@ -161,6 +160,19 @@ http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kube
 
 ブラウザには、Kubernetes Dashboard の認証画面が表示されます。そこでKubeconfigを選んで、kubeconfigのファイルとして、$KUBECONFIG にセットしたパスのファイルを選択します。そして、「サインイン」ボタンをクリックします。これで、Kubernetes Dashboard のトップ画面が表示されます。
 
+
+# コンテナエンジンの選択
+
+ファイル ansible-playbook/versions.yml の先頭部分に以下の記述があります。以下の例のように、デフォルトが docker-ce になっています。この設定では、Kubernetesのコンテナランタイムは、Dockerが利用されます。この値をcontainerdに変更すると、Containerdがセットアップされます。どちらも動作に変わりはありませんが、containedを選んだ方が、40MB程度メモリ消費量が抑えられます。また、K8sクラスタのノードの中で、dockerコマンドが使えなくなります。
+
+~~~
+# Container_Engine
+#
+# どちらか一方を選んで、有効化してください。
+# Choose either one and enable it.  docker-ce or containerd
+container_engine: docker-ce
+#container_engine: containerd
+~~~
 
 
 以上です。
