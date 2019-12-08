@@ -1,4 +1,7 @@
 # Container_Engine
+#
+# どちらか一方を選んで、有効化してください。
+# Choose either one and enable it.  docker-ce or containerd
 container_engine: docker-ce
 #container_engine: containerd
 
@@ -17,8 +20,7 @@ k8s_version: =1.16.3-00
 docker_version: =18.06.1~ce~3-0~ubuntu
 
 # Containerd version
-containerd_version: =1.2.4
-
+containerd_version: 1.2.4
 
 # K8s Minor Number
 k8s_minor_ver: "{{ k8s_version.split('.')[1] }}"

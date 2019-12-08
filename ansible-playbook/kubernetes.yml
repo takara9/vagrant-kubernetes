@@ -32,7 +32,7 @@
       state: present
     when: container_engine == "containerd"
 
- - name: Download Containerd
+  - name: Download Containerd
     get_url:
       url: https://storage.googleapis.com/cri-containerd-release/cri-containerd-{{ containerd_version }}.linux-amd64.tar.gz
       dest: /tmp/cri-containerd-{{ containerd_version }}.linux-amd64.tar.gz
