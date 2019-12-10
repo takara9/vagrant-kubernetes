@@ -40,7 +40,7 @@ Vagrant と VirtualBox が動作するOSが必要です。
 
 
 ~~~
-$ git clone -b 1.15 https://github.com/takara9/vagrant-kubernetes
+$ git clone -b 1.17 https://github.com/takara9/vagrant-kubernetes
 $ cd vagrant-Kubernetes
 $ vagrant up
 ~~~
@@ -48,35 +48,58 @@ $ vagrant up
 上記のコマンドを実行して、20分程度で、master, node1, node2 の３台の仮想サーバーからなる kubernetes クラスタが起動します。
 
 ~~~
+$ vagrant status
+Current machine states:
+
+node1                     running (virtualbox)
+node2                     running (virtualbox)
+master                    running (virtualbox)
+
+This environment represents multiple VMs. The VMs are all listed
+above with their current state. For more information about a specific
+VM, run `vagrant status NAME`.
+
+
 $ vagrant ssh master
+＜中略＞
+New release '18.04.3 LTS' available.
+Run 'do-release-upgrade' to upgrade to it.
+
 
 vagrant@master:~$ kubectl get node
-NAME     STATUS   ROLES    AGE   VERSION
-master   Ready    master   98s   v1.16.3
-node1    Ready    <none>   56s   v1.16.3
-node2    Ready    <none>   62s   v1.16.3
+NAME     STATUS   ROLES    AGE    VERSION
+master   Ready    master   103s   v1.17.0
+node1    Ready    <none>   59s    v1.17.0
+node2    Ready    <none>   59s    v1.17.0
+
 
 vagrant@master:~$ kubectl version --short
-Client Version: v1.16.3
-Server Version: v1.16.3
+Client Version: v1.17.0
+Server Version: v1.17.0
+
 
 vagrant@master:~$ kubectl get componentstatus
-NAME                 AGE
-controller-manager   <unknown>
-scheduler            <unknown>
-etcd-0               <unknown>
+NAME                 STATUS    MESSAGE             ERROR
+scheduler            Healthy   ok
+controller-manager   Healthy   ok
+etcd-0               Healthy   {"health":"true"}
+
 
 vagrant@master:~$ kubectl cluster-info
 Kubernetes master is running at https://172.16.20.11:6443
 KubeDNS is running at https://172.16.20.11:6443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
 Metrics-server is running at https://172.16.20.11:6443/api/v1/namespaces/kube-system/services/https:metrics-server:/proxy
 
-To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
+To further debug and diagnose 
+
+
+vagrant@master:~$ kubectl top node
+NAME     CPU(cores)   CPU%   MEMORY(bytes)   MEMORY%
+master   196m         9%     691Mi           77%
+node1    20m          2%     467Mi           52%
+node2    25m          2%     468Mi           52%
 
 ~~~
-
-1.16 の kubectlは次のコマンドでは componentstatus が動かない様です。バージョン 1.15 のkubeclt を利用すると表示されます。参考URL https://discuss.kubernetes.io/t/component-status-showing-unknown-in-a-multi-master-cluster/8034
-
 
 
 ## kubectl の設定方法
@@ -91,22 +114,23 @@ Windows10 の場合は、次のようにして、環境変数をセットする�
 masterと繋がるようになります。
 
 ~~~
-C:\Users\Maho\tmp\vagrant-kubernetes>set KUBECONFIG=%CD%\kubeconfig\config
-C:\Users\Maho\tmp\vagrant-kubernetes>kubectl get node
-NAME     STATUS   ROLES    AGE   VERSION
-master   Ready    master   25m   v1.16.0
-node1    Ready    <none>   24m   v1.16.0
-node2    Ready    <none>   24m   v1.16.0
+C:\Users\MAHOTAKARA\k8s-1.17>set KUBECONFIG=%CD%\kubeconfig\config
+
+C:\Users\MAHOTAKARA\k8s-1.17>kubectl get node
+NAME     STATUS   ROLES    AGE    VERSION
+master   Ready    master   129m   v1.17.0
+node1    Ready    <none>   128m   v1.17.0
+node2    Ready    <none>   128m   v1.17.0
 ~~~
 
 Linux / macOS では、git clone で作成されたディレクトリで、次のコマンドを実行します。
 ~~~
-imac:k8s_v1.16 maho$ export KUBECONFIG=`pwd`/kubeconfig/config
-imac:k8s_v1.16 maho$ kubectl get node
-NAME     STATUS   ROLES    AGE   VERSION
-master   Ready    master   25m   v1.16.0
-node1    Ready    <none>   24m   v1.16.0
-node2    Ready    <none>   24m   v1.16.0
+$ export KUBECONFIG=`pwd`/kubeconfig/config
+$ kubectl get node
+NAME     STATUS   ROLES    AGE    VERSION
+master   Ready    master   130m   v1.17.0
+node1    Ready    <none>   129m   v1.17.0
+node2    Ready    <none>   129m   v1.17.0
 ~~~
 
 ホームディクレクトリの.kubeに、configをコピーして利用することで、環境変数 KUBECOFIG を
