@@ -111,8 +111,8 @@
       state: started
       daemon_reload: yes
       name: containerd
+      enabled: yes
     when: container_engine == "containerd"
-
 
 
   ## GlusterFS のインストール
