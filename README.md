@@ -8,6 +8,7 @@ vagrant コマンドからクラスタを起動することで、パソコン上
 1. master 172.16.20.11
 1. node1  172.16.20.12
 1. node2  172.16.20.13
+1. node3  172.16.20.14
 
 
 ## このクラスタを起動するために必要なソフトウェア
@@ -55,6 +56,7 @@ NAME     STATUS   ROLES    AGE   VERSION
 master   Ready    master   98s   v1.16.3
 node1    Ready    <none>   56s   v1.16.3
 node2    Ready    <none>   62s   v1.16.3
+node3    Ready    <none>   62s   v1.16.3
 
 vagrant@master:~$ kubectl version --short
 Client Version: v1.16.3
