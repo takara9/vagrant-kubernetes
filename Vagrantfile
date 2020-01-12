@@ -10,11 +10,11 @@ Vagrant.configure(2) do |config|
     machine.vm.box = "ubuntu/xenial64"
     machine.vm.hostname = 'node1'
     machine.vm.network :private_network,ip: "172.16.20.12"
-    #machine.vm.network :public_network, ip: "192.168.1.92", bridge: "en0: Ethernet"
+    machine.vm.network :public_network, ip: "192.168.1.92", bridge: "en0: Ethernet"
     machine.vm.provider "virtualbox" do |vbox|
       vbox.gui = false
-      vbox.cpus = 1
-      vbox.memory = 1024
+      vbox.cpus = 3
+      vbox.memory = 8192
     end
     machine.vm.synced_folder ".", "/vagrant", owner: "vagrant",
       group: "vagrant", mount_options: ["dmode=700", "fmode=700"]
@@ -38,11 +38,11 @@ Vagrant.configure(2) do |config|
     machine.vm.box = "ubuntu/xenial64"
     machine.vm.hostname = 'node2'
     machine.vm.network :private_network,ip: "172.16.20.13"
-    #machine.vm.network :public_network, ip: "192.168.1.93", bridge: "en0: Ethernet"
+    machine.vm.network :public_network, ip: "192.168.1.93", bridge: "en0: Ethernet"
     machine.vm.provider "virtualbox" do |vbox|
       vbox.gui = false
-      vbox.cpus = 1
-      vbox.memory = 1024
+      vbox.cpus = 3
+      vbox.memory = 8192
     end
     machine.vm.synced_folder ".", "/vagrant", owner: "vagrant",
       group: "vagrant", mount_options: ["dmode=700", "fmode=700"]
@@ -59,6 +59,33 @@ Vagrant.configure(2) do |config|
     end
   end
 
+  # ノード3 仮想マシンの起動
+  #
+  config.vm.define 'node3' do |machine|
+    machine.vm.box = "ubuntu/xenial64"
+    machine.vm.hostname = 'node3'
+    machine.vm.network :private_network,ip: "172.16.20.14"
+    machine.vm.network :public_network, ip: "192.168.1.94", bridge: "en0: Ethernet"
+    machine.vm.provider "virtualbox" do |vbox|
+      vbox.gui = false
+      vbox.cpus = 3
+      vbox.memory = 8192
+    end
+    machine.vm.synced_folder ".", "/vagrant", owner: "vagrant",
+      group: "vagrant", mount_options: ["dmode=700", "fmode=700"]
+
+    # ノード２ docker & k8sのインストール
+    #
+    machine.vm.provision "ansible_local" do |ansible|
+      ansible.playbook       = "ansible-playbook/kubernetes.yml"
+      ansible.version        = "latest"
+      ansible.verbose        = false
+      ansible.install        = true
+      ansible.limit          = "node4"
+      ansible.inventory_path = "ansible-playbook/hosts"
+    end
+  end
+  
 
   #
   # マスタ 仮想マシンの起動
@@ -67,11 +94,11 @@ Vagrant.configure(2) do |config|
     machine.vm.box = "ubuntu/xenial64"
     machine.vm.hostname = 'master'
     machine.vm.network :private_network,ip: "172.16.20.11"
-    #machine.vm.network :public_network, ip: "192.168.1.91", bridge: "en0: Ethernet"
+    machine.vm.network :public_network, ip: "192.168.1.91", bridge: "en0: Ethernet"
     machine.vm.provider "virtualbox" do |vbox|
       vbox.gui = false
       vbox.cpus = 2
-      vbox.memory = 1024
+      vbox.memory = 2048
     end
     machine.vm.synced_folder ".", "/vagrant", owner: "vagrant",    
       group: "vagrant", mount_options: ["dmode=700", "fmode=700"]
