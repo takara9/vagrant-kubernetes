@@ -10,7 +10,7 @@ Vagrant.configure(2) do |config|
     machine.vm.box = "ubuntu/xenial64"
     machine.vm.hostname = 'node1'
     machine.vm.network :private_network,ip: "172.16.20.12"
-    machine.vm.network :public_network, ip: "192.168.1.92", bridge: "en0: Ethernet"
+    #machine.vm.network :public_network, ip: "192.168.1.92", bridge: "en0: Ethernet"
     machine.vm.provider "virtualbox" do |vbox|
       vbox.gui = false
       vbox.cpus = 3
@@ -38,7 +38,7 @@ Vagrant.configure(2) do |config|
     machine.vm.box = "ubuntu/xenial64"
     machine.vm.hostname = 'node2'
     machine.vm.network :private_network,ip: "172.16.20.13"
-    machine.vm.network :public_network, ip: "192.168.1.93", bridge: "en0: Ethernet"
+    #machine.vm.network :public_network, ip: "192.168.1.93", bridge: "en0: Ethernet"
     machine.vm.provider "virtualbox" do |vbox|
       vbox.gui = false
       vbox.cpus = 3
@@ -65,7 +65,7 @@ Vagrant.configure(2) do |config|
     machine.vm.box = "ubuntu/xenial64"
     machine.vm.hostname = 'node3'
     machine.vm.network :private_network,ip: "172.16.20.14"
-    machine.vm.network :public_network, ip: "192.168.1.94", bridge: "en0: Ethernet"
+    #machine.vm.network :public_network, ip: "192.168.1.94", bridge: "en0: Ethernet"
     machine.vm.provider "virtualbox" do |vbox|
       vbox.gui = false
       vbox.cpus = 3
@@ -81,7 +81,7 @@ Vagrant.configure(2) do |config|
       ansible.version        = "latest"
       ansible.verbose        = false
       ansible.install        = true
-      ansible.limit          = "node4"
+      ansible.limit          = "node3"
       ansible.inventory_path = "ansible-playbook/hosts"
     end
   end
@@ -94,7 +94,7 @@ Vagrant.configure(2) do |config|
     machine.vm.box = "ubuntu/xenial64"
     machine.vm.hostname = 'master'
     machine.vm.network :private_network,ip: "172.16.20.11"
-    machine.vm.network :public_network, ip: "192.168.1.91", bridge: "en0: Ethernet"
+    #machine.vm.network :public_network, ip: "192.168.1.91", bridge: "en0: Ethernet"
     machine.vm.provider "virtualbox" do |vbox|
       vbox.gui = false
       vbox.cpus = 2

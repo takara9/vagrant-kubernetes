@@ -9,6 +9,18 @@
 
   - debug: var=k8s_minor_ver
 
+  - name: Ensure AppArmor service is stopped
+    command: /etc/init.d/apparmor stop
+
+  - name: Unload AppArmor profiles
+    command: /etc/init.d/apparmor teardown
+
+  - name: Remove AppArmor profiles
+    command: update-rc.d -f apparmor remove
+
+  - name: Remove "apparmor" package
+    command: apt-get remove apparmor -y
+
   ##########################################
   ## Containerd のインストール
   - name: Install the prerequisite packeage
