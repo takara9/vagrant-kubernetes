@@ -131,7 +131,7 @@
   #
   - name: Add GlusterFS Repository
     apt_repository:
-      repo: ppa:gluster/glusterfs-3.12
+      repo: ppa:gluster/glusterfs-7
 
   - name: Install GlusterFS client
     apt:
