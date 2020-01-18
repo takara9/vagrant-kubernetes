@@ -7,7 +7,7 @@ Vagrant.configure(2) do |config|
   # ノード１ 仮想マシンの起動
   #
   config.vm.define 'node1' do |machine|
-    machine.vm.box = "ubuntu/bionic64"
+    machine.vm.box = "ubuntu/xenial64"
     machine.vm.hostname = 'node1'
     machine.vm.network :private_network,ip: "172.16.20.12"
     #machine.vm.network :public_network, ip: "192.168.1.92", bridge: "en0: Ethernet"
@@ -35,7 +35,7 @@ Vagrant.configure(2) do |config|
   # ノード２ 仮想マシンの起動
   #
   config.vm.define 'node2' do |machine|
-    machine.vm.box = "ubuntu/bionic64"
+    machine.vm.box = "ubuntu/xenial64"
     machine.vm.hostname = 'node2'
     machine.vm.network :private_network,ip: "172.16.20.13"
     #machine.vm.network :public_network, ip: "192.168.1.93", bridge: "en0: Ethernet"
@@ -64,7 +64,7 @@ Vagrant.configure(2) do |config|
   # マスタ 仮想マシンの起動
   #
   config.vm.define 'master' do |machine|
-    machine.vm.box = "ubuntu/bionic64"    
+    machine.vm.box = "ubuntu/xenial64"
     machine.vm.hostname = 'master'
     machine.vm.network :private_network,ip: "172.16.20.11"
     #machine.vm.network :public_network, ip: "192.168.1.91", bridge: "en0: Ethernet"
