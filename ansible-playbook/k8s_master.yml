@@ -164,7 +164,7 @@
 
     - name: add a new line
       blockinfile:
-        path: /home/vagrant/metrics-server/deploy/1.8+/metrics-server-deployment.yaml
+        path: /home/vagrant/metrics-server/deploy/kubernetes/metrics-server-deployment.yaml
         insertafter: '        args:'
         block: |
            # added lines
@@ -173,7 +173,7 @@
 
     - name: Deploy Metrics Server
       become_user: vagrant
-      command: kubectl apply -f /home/vagrant/metrics-server/deploy/1.8+
+      command: kubectl apply -f /home/vagrant/metrics-server/deploy/kubernetes
 
 
     ## Dashboard UI インストール
