@@ -3,29 +3,39 @@
 - name: "kubeadm reset v1.11 or later"
   command: kubeadm reset -f
 
-## クラスタ参加用のコマンドを作成
-#
+## クラスタ参加用のコマンドを作成 Ubuntu
 - name: kubeadm init for Ubuntu
   command: kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ ansible_facts.enp0s8.ipv4.address }} --service-cidr=10.32.0.0/24
-  register: join
+  register: join_ubuntu
   when:
     - ansible_facts.distribution == "Ubuntu"
+## k8sノード用コマンドを保存 Ubuntu
+- name: create kubeadm join command
+  shell: echo "join_command" ":" {{ join_ubuntu.stdout_lines[-2] }} {{ join_ubuntu.stdout_lines[-1] }} > /tmp/kubeadm-join.yaml
+  when:
+    - ansible_facts.distribution == "Ubuntu"
+  
 
+## クラスタ参加用のコマンドを作成 CentOS
 - name: kubeadm init for CentOS
   command: kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ ansible_facts.eth1.ipv4.address }} --service-cidr=10.32.0.0/24
-  register: join
+  register: join_centos
+  when:
+    - ansible_facts.distribution == "CentOS"
+## k8sノード用コマンドを保存 CentOS
+- name: create kubeadm join command
+  shell: echo "join_command" ":" {{ join_centos.stdout_lines[-2] }} {{ join_centos.stdout_lines[-1] }} > /tmp/kubeadm-join.yaml
   when:
     - ansible_facts.distribution == "CentOS"
 
-
-## k8sノード用コマンドを保存
-#
-- name: create kubeadm join command
-  shell: echo "join_command" ":" {{ join.stdout_lines[-2] }} {{ join.stdout_lines[-1] }} > /tmp/kubeadm-join.yaml
+## vagrantのディレクトリへコピー
+## terraformを使う場合は修正
 - name: copy /tmp/kubeadm-join.yaml -> home
   copy:
     src: /tmp/kubeadm-join.yaml
     dest: /vagrant/kubeadm-join.tmp
+
+
 ## kubeletのDNSのIPアドレスを変更
 #
 - name: change config.yaml

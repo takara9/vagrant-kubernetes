@@ -2,9 +2,8 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-#linux_os = "ubuntu/xenial64"
-#linux_os = "centos/7"    #/vagrantがリアルタイムに利用できない
-linux_os  = "generic/centos7" 
+linux_os = "ubuntu/bionic64"   # Ubuntu 18.04
+#linux_os  = "generic/centos7"  # CentOS 7.7
 bridge_if = "en0: Wi-Fi (Wireless)"
 
 vm_spec = [
