@@ -1,5 +1,9 @@
 # default var file
 ---
+#
+# CentOSかUbuntuによってバージョンの表記が異なるので注意
+#
+
 # Kubernetes Package Version
 k8s_version_ubuntu: =1.14.10-00
 k8s_version_centos: 1.14.10-0

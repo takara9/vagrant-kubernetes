@@ -1,2 +1,0 @@
----
-join_cmd: /vagrant/playbook/kubeadm-join.yaml

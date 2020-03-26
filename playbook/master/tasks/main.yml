@@ -4,6 +4,7 @@
   command: kubeadm reset -f
 
 ## クラスタ参加用のコマンドを作成
+#
 - name: kubeadm init for Ubuntu
   command: kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ ansible_facts.enp0s8.ipv4.address }} --service-cidr=10.32.0.0/24
   register: join
@@ -16,15 +17,15 @@
   when:
     - ansible_facts.distribution == "CentOS"
 
+
 ## k8sノード用コマンドを保存
 #
-- file:
-    path: "{{ join_cmd }}"
-    state: absent
-
 - name: create kubeadm join command
-  shell: echo "join_command" ":" {{ join.stdout_lines[-2] }} {{ join.stdout_lines[-1] }} > {{ join_cmd }}
-
+  shell: echo "join_command" ":" {{ join.stdout_lines[-2] }} {{ join.stdout_lines[-1] }} > /tmp/kubeadm-join.yaml
+- name: copy /tmp/kubeadm-join.yaml -> home
+  copy:
+    src: /tmp/kubeadm-join.yaml
+    dest: /vagrant/kubeadm-join.tmp
 ## kubeletのDNSのIPアドレスを変更
 #
 - name: change config.yaml
@@ -40,7 +41,6 @@
     state: restarted
     daemon_reload: yes
     name: kubelet
-
     
 ## kubeconfigディレクトリ作成
 #
@@ -60,7 +60,6 @@
     group: vagrant
     mode:  '0755'
 
-
 ##  configファイルのコピー
 #
 - name: chmod admin.conf
@@ -78,7 +77,6 @@
     group: vagrant
     mode:  '0600'
 
-    
 ## flannelのマニフェストダウンロード
 #
 - name: Download a manifest of Flannel for k8s ver > 11
@@ -126,24 +124,20 @@
     mode: '0644'
     owner: vagrant
     group: vagrant
-
 - name: Change Dashboard RBAC
   replace:
     path: /home/vagrant/recommended.yaml
     after: '  kind: ClusterRole'
     regexp: '^  name: kubernetes-dashboard'
     replace: '  name: cluster-admin'
-
 - name: Deploy Dashboard UI
   become_user: vagrant
   command: kubectl apply -f /home/vagrant/recommended.yaml
-
 - name: setup kubeconfig
   become_user: vagrant    
   shell: |
         TOKEN=$(kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret |grep kubernetes-dashboard-token-* | awk '{print $1}') |awk '$1=="token:"{print $2}')
         kubectl config set-credentials kubernetes-admin --token="${TOKEN}"
-
 - name: copy config to host dir
   copy:
     src:  /home/vagrant/.kube/config

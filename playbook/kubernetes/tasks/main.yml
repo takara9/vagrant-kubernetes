@@ -1,5 +1,5 @@
-# 共通タスク
-- debug: msg="{{ ansible_facts }}"
+# Master と Workerで共通のタスク
+#- debug: msg="{{ ansible_facts }}"
 
 ##################################################
 ##  Linux Distributionの設定
@@ -19,17 +19,12 @@
     enabled: no
   when:
     - ansible_facts.distribution == "CentOS"
-- name: check existing /swapfile
-  stat:
-    path: "/swapfile"
-  register: swap
 - name: Disable Swap area and delete
   shell: |
-    swapoff /swapfile
-    rm -f /swapfile
+    swapoff /dev/dm-1
+    systemctl daemon-reload
   when:
     - ansible_facts.distribution == "CentOS"
-    - swap.stat.exists == true
 ##################################################
 ##  Docker CE のインストール
 ##################################################

@@ -3,8 +3,8 @@
 # vi: set ft=ruby :
 
 #linux_os = "ubuntu/xenial64"
-linux_os = "generic/centos7" #SWAPが設定されておりNG
-#linux_os = "centos/7"
+#linux_os = "centos/7"    #/vagrantがリアルタイムに利用できない
+linux_os  = "generic/centos7" 
 bridge_if = "en0: Wi-Fi (Wireless)"
 
 vm_spec = [
