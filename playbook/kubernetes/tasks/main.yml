@@ -1,0 +1,232 @@
+# Master と Workerで共通のタスク
+#- debug: msg="{{ ansible_facts }}"
+
+##################################################
+##  Linux Distributionの設定
+##################################################
+## セキュリティ
+- name: Change selinux
+  selinux:
+    policy: targeted
+    state: permissive
+  when:
+    - ansible_facts.distribution == "CentOS"
+## ファイアウオールの停止
+- name: Stop firewalld
+  systemd:
+    name: firewalld
+    state: stopped
+    enabled: no
+  when:
+    - ansible_facts.distribution == "CentOS"
+- name: Disable Swap area and delete
+  shell: |
+    swapoff /dev/dm-1
+    systemctl daemon-reload
+  when:
+    - ansible_facts.distribution == "CentOS"
+##################################################
+##  Docker CE のインストール
+##################################################
+################################################## Ubuntu
+- name: Add Docker GPG key
+  apt_key: url=https://download.docker.com/linux/ubuntu/gpg
+  when:
+    - ansible_facts.distribution == "Ubuntu"
+- name: Add Docker APT repository
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ansible_distribution_release}} stable
+  when:
+    - ansible_facts.distribution == "Ubuntu"
+- name: Install a list of packages
+  apt:
+    name: "{{ packages }}"
+    state: present
+    update_cache: yes
+  vars:
+    packages:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - software-properties-common
+    - nfs-common
+    - docker-ce{{ docker_version_ubuntu }}
+  when:
+    - ansible_facts.distribution == "Ubuntu"
+################################################## CentOS
+- name: ensure a list of packages uninstalled
+  yum:
+    name: "{{ packages }}"
+    state: absent
+  vars:
+    packages:
+    - docker
+    - docker-client
+    - docker-client-latest
+    - docker-common
+    - docker-latest
+    - docker-latest-logrotate
+    - docker-logrotate
+    - docker-engine
+  when:
+    - ansible_facts.distribution == "CentOS"
+- name: Add Docker repository
+  shell: "yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo"
+  args:
+    chdir: "/etc/yum.repos.d"
+    creates: docker-ce.repo
+  when:
+    - ansible_facts.distribution == "CentOS"
+- name: ensure a list of packages installed
+  yum:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+    - docker-ce-{{ docker_version_centos }}
+    - containerd.io
+    - git
+  when:
+    - ansible_facts.distribution == "CentOS"
+################################################### Ubuntu & CentOS    
+- name: Add the user 'vagrant' with a specific uid and a primary group of 'docker'
+  user:
+    name: vagrant
+    comment: docker exection user
+    group: docker
+- name: Start dockerd
+  systemd:
+    name: docker
+    state: started
+    enabled: yes
+
+###################################################
+## GlusterFS のインストール
+################################################### Ubuntu
+- name: Add GlusterFS Repository
+  apt_repository:
+    repo: ppa:gluster/glusterfs-7
+  when:
+    - ansible_facts.distribution == "Ubuntu"
+- name: Install GlusterFS client
+  apt:
+    name: glusterfs-client
+    state: present
+    update_cache: yes
+  when:
+    - ansible_facts.distribution == "Ubuntu"
+## カーネル設定変更 
+- name: Set sysctl 
+  sysctl:
+    name: net.bridge.bridge-nf-call-iptables
+    value: "1"
+    sysctl_set: yes
+    sysctl_file: /etc/sysctl.conf      
+    state: present
+    reload: yes
+  when:
+    - ansible_facts.distribution == "Ubuntu"
+- name: modprobe br_netfilter
+  command: modprobe br_netfilter
+  when:
+    - ansible_facts.distribution == "CentOS"
+- sysctl:
+    name: net.bridge.bridge-nf-call-iptables
+    value: '1'
+    sysctl_set: yes
+    state: present
+    reload: yes
+  when:
+    - ansible_facts.distribution == "CentOS"
+    
+###################################################  
+## Kubernetes のインストール
+################################################### Ubuntu
+- name: add Kubernetes apt-key
+  apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+  when:
+    - ansible_facts.distribution == "Ubuntu"
+- name: add Kubernetes' APT repository
+  apt_repository:
+    repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
+    state: present
+    filename: 'kubernetes'
+  when:
+    - ansible_facts.distribution == "Ubuntu"
+- name: Install kubectl
+  apt:
+    name: kubectl{{ k8s_version_ubuntu }}
+    state: present
+  when:
+    - ansible_facts.distribution == "Ubuntu"
+- name: Install kubelet
+  apt:
+    name: kubelet{{ k8s_version_ubuntu }}
+    state: present
+  when:
+    - ansible_facts.distribution == "Ubuntu"
+- name: Install kubeadm
+  apt:
+    name: kubeadm{{ k8s_version_ubuntu }}
+    state: present
+  when:
+    - ansible_facts.distribution == "Ubuntu"
+################################################### CentOS
+- name: check exisiting /etc/yum.repos.d/kubernetes.repo
+  stat:
+    path: "/etc/yum.repos.d/kubernetes.repo"
+  register: kubernetes_repo
+- name: install kubernetes.repo
+  template:
+    src: kubernetes.repo
+    dest: /etc/yum.repos.d/kubernetes.repo
+  when:
+    - ansible_facts.distribution == "CentOS"
+    - kubernetes_repo.stat.exists == false
+- name: install kubelet kubeadm kubectl
+  yum:
+    name: "{{ packages }}"
+    state: present
+    disable_excludes: kubernetes
+  vars:
+    packages:
+    - kubelet-{{ k8s_version_centos }}
+    - kubeadm-{{ k8s_version_centos }}
+    - kubectl-{{ k8s_version_centos }}
+  when:
+    - ansible_facts.distribution == "CentOS"
+- name: enable kubelet
+  systemd:
+    name: kubelet
+    state: started
+    enabled: yes
+
+###################################################  
+## Kubernetes の設定
+################################################### Ubuntu & CentOS
+
+## Kubelet の起動パラメータを変更
+- name: change 10-kubeadm.conf for v1.11 or later for Ubuntu
+  replace:
+    dest: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+    regexp: 'KUBELET_EXTRA_ARGS$'
+    replace: KUBELET_EXTRA_ARGS --node-ip={{ ansible_facts.enp0s8.ipv4.address }} --cluster-dns=10.32.0.10
+  when:
+    - ansible_facts.distribution == "Ubuntu"
+- name: change kubelet.service for CentOS
+  replace:
+    dest: /etc/systemd/system/multi-user.target.wants/kubelet.service 
+    regexp: 'ExecStart=/usr/bin/kubelet'
+    replace: ExecStart=/usr/bin/kubelet --node-ip={{ ansible_facts.eth1.ipv4.address }} --cluster-dns=10.32.0.10
+  when:
+    - ansible_facts.distribution == "CentOS"
+
+## 変更を反映
+- name: daemon-reload and restart kubelet
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: kubelet
+

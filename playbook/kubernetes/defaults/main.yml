@@ -1,0 +1,17 @@
+# default var file
+---
+#
+# CentOSかUbuntuによってバージョンの表記が異なるので注意
+#
+
+# Kubernetes Package Version
+k8s_version_ubuntu: =1.15.11-00
+k8s_version_centos: 1.15.11-0
+
+# Docker Package Version
+docker_version_ubuntu: =18.06.1~ce~3-0~ubuntu
+docker_version_centos: 18.06.3.ce-3.el7
+
+# K8s Minor Number
+k8s_minor_ver: "{{ k8s_version.split('.')[1] }}"
+
