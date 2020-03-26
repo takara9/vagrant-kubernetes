@@ -123,6 +123,9 @@ spec:
         args:
         - --ip-masq
         - --kube-subnet-mgr
+# BEGIN ANSIBLE MANAGED BLOCK
+        - --iface=enp0s8
+# END ANSIBLE MANAGED BLOCK
         resources:
           requests:
             cpu: "100m"
