@@ -1,0 +1,9 @@
+master     ansible_connection=local
+node1      ansible_connection=local
+node2      ansible_connection=local
+
+[nodes]
+node[1:2]
+
+
+
