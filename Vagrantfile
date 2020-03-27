@@ -36,7 +36,7 @@ Vagrant.configure("2") do |config|
       v.vm.box = spec[:box]
       v.vm.hostname = spec[:name]
       v.vm.network :private_network,ip: spec[:private_ip]
-      v.vm.network :public_network,ip:  spec[:public_ip], bridge: bridge_if
+      #v.vm.network :public_network,ip:  spec[:public_ip], bridge: bridge_if
       v.vm.provider "virtualbox" do |vbox|
         vbox.gui = false
         vbox.cpus = spec[:cpu]
