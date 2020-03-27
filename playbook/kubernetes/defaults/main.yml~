@@ -1,0 +1,29 @@
+# default var file
+---
+# どちらか一方を選んで、有効化してください。
+# Chose either one and enable it. docker-ce or containerd
+container_engine: docker-ce
+#container_engine: containerd
+
+
+# Docker package version
+docker_version_ubuntu: =18.06.1~ce~3-0~ubuntu
+docker_version_centos: 18.06.3.ce-3.el7
+
+
+# Containerd version
+containerd_version: 1.2.13
+
+
+#
+# CentOSかUbuntuによってバージョンの表記が異なるので注意
+#
+# Kubernetes package version
+k8s_version_ubuntu: =1.16.8-00
+k8s_version_centos: 1.16.8-0
+
+
+# K8s minor version number
+k8s_minor_ver: "{{ k8s_version.split('.')[1] }}"
+
+
