@@ -2,8 +2,8 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-#linux_os = "ubuntu/bionic64"   # Ubuntu 18.04
-linux_os  = "generic/centos7"  # CentOS 7.7
+linux_os = "ubuntu/bionic64"   # Ubuntu 18.04
+#linux_os  = "generic/centos7"  # CentOS 7.7
 bridge_if = "en0: Wi-Fi (Wireless)"
 
 vm_spec = [
@@ -36,7 +36,7 @@ Vagrant.configure("2") do |config|
       v.vm.box = spec[:box]
       v.vm.hostname = spec[:name]
       v.vm.network :private_network,ip: spec[:private_ip]
-      v.vm.network :public_network,ip:  spec[:public_ip], bridge: bridge_if
+      #v.vm.network :public_network,ip:  spec[:public_ip], bridge: bridge_if
       v.vm.provider "virtualbox" do |vbox|
         vbox.gui = false
         vbox.cpus = spec[:cpu]
