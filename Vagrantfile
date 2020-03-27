@@ -5,7 +5,8 @@
 #linux_os = "ubuntu/bionic64"   # Ubuntu 18.04
 #linux_os  = "generic/centos7"  # CentOS 7.7
 linux_os  = "generic/centos8"  # CentOS 8
-bridge_if = "en0: Wi-Fi (Wireless)"
+#bridge_if = "en0: Wi-Fi (Wireless)"
+bridge_if = "eno1"
 
 vm_spec = [
   { name: "master", cpu: 2, memory: 2048,

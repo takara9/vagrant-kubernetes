@@ -62,21 +62,15 @@ VM, run `vagrant status NAME`.
 
 $ vagrant ssh master
 ＜中略＞
-New release '18.04.3 LTS' available.
-Run 'do-release-upgrade' to upgrade to it.
-
-
-vagrant@master:~$ kubectl get node
-NAME     STATUS   ROLES    AGE    VERSION
-master   Ready    master   103s   v1.17.0
-node1    Ready    <none>   59s    v1.17.0
-node2    Ready    <none>   59s    v1.17.0
-
+[vagrant@master ~]$ kubectl get node
+NAME     STATUS     ROLES    AGE     VERSION
+master   Ready      master   6m14s   v1.18.0
+node1    Ready      <none>   3m14s   v1.18.0
+node2    Ready      <none>   29s     v1.18.0
 
 vagrant@master:~$ kubectl version --short
-Client Version: v1.17.0
-Server Version: v1.17.0
-
+Client Version: v1.18.0
+Server Version: v1.18.0
 
 vagrant@master:~$ kubectl get componentstatus
 NAME                 STATUS    MESSAGE             ERROR
@@ -84,21 +78,17 @@ scheduler            Healthy   ok
 controller-manager   Healthy   ok
 etcd-0               Healthy   {"health":"true"}
 
-
 vagrant@master:~$ kubectl cluster-info
 Kubernetes master is running at https://172.16.20.11:6443
 KubeDNS is running at https://172.16.20.11:6443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
 Metrics-server is running at https://172.16.20.11:6443/api/v1/namespaces/kube-system/services/https:metrics-server:/proxy
 
-To further debug and diagnose 
-
-
+既知の問題で以下のコマンドが実行できません。
 vagrant@master:~$ kubectl top node
 NAME     CPU(cores)   CPU%   MEMORY(bytes)   MEMORY%
 master   196m         9%     691Mi           77%
 node1    20m          2%     467Mi           52%
 node2    25m          2%     468Mi           52%
-
 ~~~
 
 
@@ -114,13 +104,13 @@ Windows10 の場合は、次のようにして、環境変数をセットする�
 masterと繋がるようになります。
 
 ~~~
-C:\Users\MAHOTAKARA\k8s-1.17>set KUBECONFIG=%CD%\kubeconfig\config
+C:\Users\MAHOTAKARA\k8s-1.18>set KUBECONFIG=%CD%\kubeconfig\config
 
 C:\Users\MAHOTAKARA\k8s-1.17>kubectl get node
 NAME     STATUS   ROLES    AGE    VERSION
-master   Ready    master   129m   v1.17.0
-node1    Ready    <none>   128m   v1.17.0
-node2    Ready    <none>   128m   v1.17.0
+master   Ready    master   129m   v1.18.0
+node1    Ready    <none>   128m   v1.18.0
+node2    Ready    <none>   128m   v1.18.0
 ~~~
 
 Linux / macOS では、git clone で作成されたディレクトリで、次のコマンドを実行します。
@@ -128,9 +118,9 @@ Linux / macOS では、git clone で作成されたディレクトリで、次�
 $ export KUBECONFIG=`pwd`/kubeconfig/config
 $ kubectl get node
 NAME     STATUS   ROLES    AGE    VERSION
-master   Ready    master   130m   v1.17.0
-node1    Ready    <none>   129m   v1.17.0
-node2    Ready    <none>   129m   v1.17.0
+master   Ready    master   130m   v1.18.0
+node1    Ready    <none>   129m   v1.18.0
+node2    Ready    <none>   129m   v1.18.0
 ~~~
 
 ホームディクレクトリの.kubeに、configをコピーして利用することで、環境変数 KUBECOFIG を
