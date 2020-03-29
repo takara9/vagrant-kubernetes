@@ -1,0 +1,10 @@
+---
+- name: k8s base
+  hosts: all
+  gather_facts: true
+  become: true
+  become_user: root
+  become_method: sudo
+  roles:
+    - kubernetes
+

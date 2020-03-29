@@ -56,7 +56,7 @@
 ##################################################
 ##  Docker CE のインストール
 ##################################################
-################################################## Ubuntu
+
 - name: Add Docker GPG key
   apt_key: url=https://download.docker.com/linux/ubuntu/gpg
   when:
@@ -68,11 +68,12 @@
   when:
     - ansible_facts.distribution == "Ubuntu"
     - container_engine == "docker-ce"    
-- name: Install a list of packages
+
+- name: Install a list of packages 1
   apt:
     name: "{{ packages }}"
     state: present
-    update_cache: yes
+    #update_cache: yes
   vars:
     packages:
     - apt-transport-https
@@ -143,12 +144,12 @@
 ###################################################
 ##  Containerd のインストール
 ###################################################
-################################################### Ubuntu
-- name: Install the prerequisite packeage
+
+- name: Install the prerequisite packeage 2
   apt:
     name: "{{ packages }}"
     state: present
-    update_cache: yes
+    #update_cache: yes
   vars:
     packages:
     - apt-transport-https
@@ -157,6 +158,43 @@
     - software-properties-common
     - nfs-common
     - libseccomp2
+  when:
+    - ansible_facts.distribution == "Ubuntu"
+    - container_engine == "containerd"
+
+- apt:
+    name: apt-transport-https
+    state: present
+  when:
+    - ansible_facts.distribution == "Ubuntu"
+    - container_engine == "containerd"
+- apt:
+    name: ca-certificates
+    state: present
+  when:
+    - ansible_facts.distribution == "Ubuntu"
+    - container_engine == "containerd"
+- apt:
+    name: curl
+    state: present
+  when:
+    - ansible_facts.distribution == "Ubuntu"
+    - container_engine == "containerd"
+- apt:
+    name: software-properties-common
+    state: present
+  when:
+    - ansible_facts.distribution == "Ubuntu"
+    - container_engine == "containerd"
+- apt:
+    name: nfs-common
+    state: present
+  when:
+    - ansible_facts.distribution == "Ubuntu"
+    - container_engine == "containerd"
+- apt:
+    name: libseccomp2
+    state: present
   when:
     - ansible_facts.distribution == "Ubuntu"
     - container_engine == "containerd"
@@ -212,7 +250,7 @@
   apt:
     name: glusterfs-client
     state: present
-    update_cache: yes
+    #update_cache: yes
   when:
     - ansible_facts.distribution == "Ubuntu"
 ## カーネル設定変更 
@@ -245,32 +283,32 @@
 ###################################################  
 ## Kubernetes のインストール
 ################################################### Ubuntu
-- name: add Kubernetes apt-key
+- name: add Kubernetes apt-key [ubuntu]
   apt_key:
     url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
     state: present
   when:
     - ansible_facts.distribution == "Ubuntu"
-- name: add Kubernetes' APT repository
+- name: add Kubernetes' APT repository [ubuntu]
   apt_repository:
     repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
     state: present
     filename: 'kubernetes'
   when:
     - ansible_facts.distribution == "Ubuntu"
-- name: Install kubectl
+- name: Install kubectl [ubuntu]
   apt:
     name: kubectl{{ k8s_version_ubuntu }}
     state: present
   when:
     - ansible_facts.distribution == "Ubuntu"
-- name: Install kubelet
+- name: Install kubelet [ubuntu]
   apt:
     name: kubelet{{ k8s_version_ubuntu }}
     state: present
   when:
     - ansible_facts.distribution == "Ubuntu"
-- name: Install kubeadm
+- name: Install kubeadm [ubuntu]
   apt:
     name: kubeadm{{ k8s_version_ubuntu }}
     state: present

@@ -1,0 +1,92 @@
+
+
+- name: Ensure /etc/hosts
+  template:
+    src: hosts.j2
+    dest: /etc/hosts
+    owner: root
+    group: root
+    mode: '0644'
+
+#############################
+- name: mkdir .ssh directory
+  file:
+    path: "/root/.ssh"
+    state: directory
+    owner: root
+    group: root
+    mode: '0700'
+- name: keygen
+  command: ssh-keygen -t rsa -N '' -f .ssh/id_rsa
+  args:
+    chdir: /root
+  when:
+    - ansible_facts.hostname == "master1"
+- name: Copy id_rsa.pub to /vagrant/keys
+  command: cp "/root/.ssh/id_rsa.pub" /vagrant/keys/id_rsa.pub
+  when:
+    - ansible_facts.hostname == "master1"
+- name: Copy id_rsa.pub to /vagrant/keys
+  command: cp "/root/.ssh/id_rsa" /vagrant/keys/id_rsa
+  when:
+    - ansible_facts.hostname == "master1"
+
+- name: Create authorized_keys
+  command: cp /vagrant/keys/id_rsa.pub  /root/.ssh/authorized_keys
+- file:
+    path: /root/.ssh/authorized_keys
+    owner: root
+    group: root
+    mode: '0400'
+
+#############################
+
+- name: Ensure group 'admin' exists
+  group:
+    name:  "{{ cluster_admin }}"
+    state: present
+- name: Add the user 'admin' with a bash shell,
+  user:
+    name:  "{{ cluster_admin }}"
+    shell: /bin/bash
+    group: "{{ cluster_admin }}"
+- name: add sudoers
+  template:
+    src:  sudor.j2
+    dest: "/etc/sudoers.d/{{ cluster_admin }}"
+    owner: root
+    group: root
+    mode: '0440'
+- name: mkdir .ssh directory
+  file:
+    path: "/home/{{ cluster_admin }}/.ssh"
+    state: directory
+    owner: "{{ cluster_admin }}"
+    group: "{{ cluster_admin }}"
+    mode: '0700'
+
+- name: Copy id_rsa to {{ cluster_admin }} home
+  command: cp /vagrant/keys/id_rsa "/home/{{ cluster_admin }}/.ssh/id_rsa"
+- file:
+    path: "/home/{{ cluster_admin }}/.ssh/id_rsa"
+    owner: "{{ cluster_admin }}"
+    group: "{{ cluster_admin }}"
+    mode: '0400'
+- name: Copy id_rsa.pub to {{ cluster_admin }} home
+  command: cp /vagrant/keys/id_rsa.pub "/home/{{ cluster_admin }}/.ssh/id_rsa.pub"
+- file:
+    path: "/home/{{ cluster_admin }}/.ssh/id_rsa.pub"
+    owner: "{{ cluster_admin }}"
+    group: "{{ cluster_admin }}"
+    mode: '0644'
+- file:
+    path: "/home/{{ cluster_admin }}/.ssh/authorized_keys"
+    owner: "{{ cluster_admin }}"
+    group: "{{ cluster_admin }}"
+    mode: '0400'
+- name: add authorized_keys
+  shell: |
+     cat /vagrant/keys/id_rsa.pub >> /home/{{ cluster_admin }}/.ssh/authorized_keys
+
+
+

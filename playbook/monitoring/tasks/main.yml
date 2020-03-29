@@ -1,0 +1,58 @@
+## Flannelのデプロイ
+#
+- name: Deploy Flannel 
+  become_user: vagrant
+  command: kubectl apply -f /home/vagrant/kube-flannel.yml
+
+
+## Metrics Server インストール
+#
+- name: Install Metrics Server
+  git:
+    repo: 'https://github.com/kubernetes-sigs/metrics-server'
+    dest: /home/vagrant/metrics-server
+  become_user: vagrant    
+
+- name: add a new line
+  blockinfile:
+    path: /home/vagrant/metrics-server/deploy/kubernetes/metrics-server-deployment.yaml
+    insertafter: '        args:'
+    block: |
+           # added lines
+                     - --kubelet-insecure-tls
+                     - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
+
+- name: Deploy Metrics Server
+  become_user: vagrant
+  command: kubectl apply -f /home/vagrant/metrics-server/deploy/kubernetes
+
+## Dashboard UI インストール
+#
+- name: Download Dashboard Manifest
+  get_url:
+    url: https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta6/aio/deploy/recommended.yaml
+    dest: /home/vagrant/
+    mode: '0644'
+    owner: vagrant
+    group: vagrant
+- name: Change Dashboard RBAC
+  replace:
+    path: /home/vagrant/recommended.yaml
+    after: '  kind: ClusterRole'
+    regexp: '^  name: kubernetes-dashboard'
+    replace: '  name: cluster-admin'
+- name: Deploy Dashboard UI
+  become_user: vagrant
+  command: kubectl apply -f /home/vagrant/recommended.yaml
+- name: setup kubeconfig
+  become_user: vagrant    
+  shell: |
+        TOKEN=$(kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret |grep kubernetes-dashboard-token-* | awk '{print $1}') |awk '$1=="token:"{print $2}')
+        kubectl config set-credentials kubernetes-admin --token="${TOKEN}"
+- name: copy config to host dir
+  copy:
+    src:  /home/vagrant/.kube/config
+    dest: /vagrant/kubeconfig/config
+    owner: vagrant
+    group: vagrant
+    mode:  '0600'

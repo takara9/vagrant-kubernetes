@@ -1,0 +1,6 @@
+# テストタスク
+- debug: msg="{{ ansible_facts.hostname }}"
+
+- name: test no-1
+  command: echo "{{ ansible_facts.hostname }}" > /home/vagrant/test.txt
+  

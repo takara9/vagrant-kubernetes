@@ -1,0 +1,10 @@
+---
+- name: k8s base
+  hosts: master1
+  gather_facts: true
+  become: true
+  become_user: root
+  become_method: sudo
+  roles:
+    - master
+

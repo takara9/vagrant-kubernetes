@@ -9,14 +9,25 @@
   register: join_ubuntu
   when:
     - ansible_facts.distribution == "Ubuntu"
-## k8sノード用コマンドを保存 Ubuntu
+
+- debug: msg="{{ join_ubuntu }}"
+
+## k8sノード用コマンドを保存（マスターノード用）Ubuntu
+- name: create kubeadm join command for control plane
+  shell: echo "ctrl_join_command" ":" {{ join_ubuntu.stdout_lines[-2] }} {{ join_ubuntu.stdout_lines[-1] }} " --experimental-control-plane" > /tmp/kubeadm-join-control.yaml
+  when:
+    - ansible_facts.distribution == "Ubuntu"
+
+## k8sノード用コマンドを保存（ワーカーノード用）Ubuntu
 - name: create kubeadm join command
   shell: echo "join_command" ":" {{ join_ubuntu.stdout_lines[-2] }} {{ join_ubuntu.stdout_lines[-1] }} > /tmp/kubeadm-join.yaml
   when:
     - ansible_facts.distribution == "Ubuntu"
-  
+
+
 
 ## クラスタ参加用のコマンドを作成 CentOS
+# インタフェース名が Ubuntu と CentOSで異なるために個別に必要、改良の余地あり
 - name: kubeadm init for CentOS
   command: kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ ansible_facts.eth1.ipv4.address }} --service-cidr=10.32.0.0/24
   register: join_centos
@@ -28,10 +39,28 @@
   when:
     - ansible_facts.distribution == "CentOS"
 
+
 ## vagrantのディレクトリへコピー
-## terraformを使う場合は修正
+##                                terraformを使う場合は修正
 - name: copy /tmp/kubeadm-join.yaml -> home
   command: cp /tmp/kubeadm-join.yaml /vagrant/kubeadm-join.tmp
+- name: copy /tmp/kubeadm-join-control.yaml -> home
+  command: cp /tmp/kubeadm-join-control.yaml /vagrant/kubeadm-join-control.tmp
+
+## Kubernetesの証明書をコピー
+##
+- name: copy kubernetes pki files to vagrant host
+  shell: |
+    cp /etc/kubernetes/pki/ca.crt /vagrant/k8s-pki
+    cp /etc/kubernetes/pki/ca.key /vagrant/k8s-pki
+    cp /etc/kubernetes/pki/sa.key /vagrant/k8s-pki
+    cp /etc/kubernetes/pki/sa.pub /vagrant/k8s-pki
+    cp /etc/kubernetes/pki/front-proxy-ca.crt /vagrant/k8s-pki
+    cp /etc/kubernetes/pki/front-proxy-ca.key /vagrant/k8s-pki
+    cp /etc/kubernetes/pki/etcd/ca.crt /vagrant/k8s-pki/etcd-ca.crt
+    cp /etc/kubernetes/pki/etcd/ca.key /vagrant/k8s-pki/etcd-ca.key
+    cp /etc/kubernetes/admin.conf /vagrant/k8s-pki
+
 
 
 ## kubeletのDNSのIPアドレスを変更
@@ -106,59 +135,12 @@
 
 ## Flannelのデプロイ
 #
-- name: Deploy Flannel 
-  become_user: vagrant
-  command: kubectl apply -f /home/vagrant/kube-flannel.yml
-
-
-## Metrics Server インストール
-#
-- name: Install Metrics Server
-  git:
-    repo: 'https://github.com/kubernetes-sigs/metrics-server'
-    dest: /home/vagrant/metrics-server
-  become_user: vagrant    
-
-- name: add a new line
-  blockinfile:
-    path: /home/vagrant/metrics-server/deploy/kubernetes/metrics-server-deployment.yaml
-    insertafter: '        args:'
-    block: |
-           # added lines
-                     - --kubelet-insecure-tls
-                     - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
-
-- name: Deploy Metrics Server
-  become_user: vagrant
-  command: kubectl apply -f /home/vagrant/metrics-server/deploy/kubernetes
-
-## Dashboard UI インストール
-#
-- name: Download Dashboard Manifest
-  get_url:
-    url: https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta6/aio/deploy/recommended.yaml
-    dest: /home/vagrant/
-    mode: '0644'
-    owner: vagrant
-    group: vagrant
-- name: Change Dashboard RBAC
-  replace:
-    path: /home/vagrant/recommended.yaml
-    after: '  kind: ClusterRole'
-    regexp: '^  name: kubernetes-dashboard'
-    replace: '  name: cluster-admin'
-- name: Deploy Dashboard UI
-  become_user: vagrant
-  command: kubectl apply -f /home/vagrant/recommended.yaml
-- name: setup kubeconfig
-  become_user: vagrant    
+- name: Deploy Flannel
   shell: |
-        TOKEN=$(kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret |grep kubernetes-dashboard-token-* | awk '{print $1}') |awk '$1=="token:"{print $2}')
-        kubectl config set-credentials kubernetes-admin --token="${TOKEN}"
-- name: copy config to host dir
-  copy:
-    src:  /home/vagrant/.kube/config
-    dest: /vagrant/kubeconfig/config
-    owner: vagrant
-    group: vagrant
-    mode:  '0600'
+        kubectl apply -f kube-flannel.yml
+  args:
+    chdir: /home/vagrant
+  become_user: vagrant
+
+
+
