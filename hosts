@@ -1,8 +1,9 @@
+bootnode    ansible_connection=local
 master1     ansible_connection=local
 master2     ansible_connection=local
 master3     ansible_connection=local
-lb1         ansible_connection=local
-lb2         ansible_connection=local
+mlb1        ansible_connection=local
+mlb2        ansible_connection=local
 node1       ansible_connection=local
 node2       ansible_connection=local
 node3       ansible_connection=local

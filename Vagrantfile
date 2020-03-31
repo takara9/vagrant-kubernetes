@@ -8,6 +8,13 @@ linux_os = "ubuntu/bionic64"   # Ubuntu 18.04
 bridge_if = "en0: Wi-Fi (Wireless)"
 
 vm_spec = [
+  { name: "bootnode", cpu: 1, memory: 1024,
+    box: linux_os,
+    private_ip: "172.16.2.10",
+    public_ip: "192.168.1.90",
+    storage: [], playbook: "install_test.yml",
+    comment: "Bootstap node" },
+    
   { name: "master1", cpu: 2, memory: 2048,
     box: linux_os,
     private_ip: "172.16.2.11",
@@ -28,18 +35,18 @@ vm_spec = [
     comment: "Master node #3" },
 
   
-  { name: "lb1", cpu: 1, memory: 1024,
+  { name: "mlb1", cpu: 1, memory: 1024,
     box: linux_os,
     private_ip: "172.16.2.21",
     public_ip: "192.168.1.101",
     storage: [], playbook: "install_test.yml",
-    comment: "Worker node #1" },
-  { name: "lb2", cpu: 1, memory: 1024,
+    comment: "Master Loadbalancer #1" },
+  { name: "mlb2", cpu: 1, memory: 1024,
     box: linux_os,
     private_ip: "172.16.2.22",
     public_ip: "192.168.1.102",
     storage: [], playbook: "install_test.yml",
-    comment: "Worker node #2" },
+    comment: "Master Loadbalancer #2" },    
 
   
   { name: "node1", cpu: 1, memory: 1024,
