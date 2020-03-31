@@ -1,26 +1,34 @@
+マスターノードへログイン
+
+~~~
+$ vagrant ssh master1
+...
+$ cd /vagrant
+~~~
 
 全ノードへの接続を確認
 
 ~~~
-ansible -i /vagrant/hosts all -m ping
+ansible -i /vagrant/hosts_ssh all -m ping
 ~~~
 
 マスタについて確認
 
 ~~~
-ansible -i /vagrant/hosts masters -m ping
+ansible -i /vagrant/hosts_ssh masters -m ping
 ~~~
 
 
 プレイブックの適用 Ubuntu 必要なパッケージのインストール
 
 ~~~
-$ vagrant ssh master1
-...
-$ cd /vagrant
-$ ansible -i /vagrant/hosts masters -m ping
-...
 $ ansible-playbook -i /vagrant/hosts_ssh /vagrant/playbook/install_k8s_base.yml
+~~~
+
+ロードバランサーの設定
+
+~~~
+$ ansible-playbook -i /vagrant/hosts_ssh /vagrant/playbook/install_loadbalancer.yml
 ~~~
 
 マスターノードの設定
@@ -40,3 +48,5 @@ ansible-playbook -i /vagrant/hosts_ssh /vagrant/playbook/install_master_2nd.yml
 テスト用
 
 ansible-playbook -i /vagrant/hosts_ssh /vagrant/playbook/install_test2.yml
+
+ansible-playbook -i /vagrant/hosts_ssh /vagrant/playbook/install_all.yml

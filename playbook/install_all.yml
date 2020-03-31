@@ -1,0 +1,54 @@
+- name: k8s base install
+  hosts:
+  - masters
+  - nodes
+  gather_facts: true
+  become: true
+  become_user: root
+  become_method: sudo
+  roles:
+    - kubernetes
+
+- name: HA-PROXY install
+  hosts:
+  - lbs
+  gather_facts: true
+  become: true
+  become_user: root
+  become_method: sudo
+  roles:
+    - haproxy
+
+- name: K8s Master 1st node setup
+  hosts: master1
+  gather_facts: true
+  become: true
+  become_user: root
+  become_method: sudo
+  roles:
+    - master
+
+- name: K8s Master 2nd node setup
+  hosts:
+  - master2
+  - master3
+  gather_facts: true
+  become: true
+  become_user: root
+  become_method: sudo
+  roles:
+    - master2
+
+- name: K8s Worker node setup
+  hosts: nodes
+  gather_facts: true
+  become: true
+  roles:
+    - node
+
+- name: K8s Monitoring setup
+  hosts: nodes
+  gather_facts: true
+  become: true
+  roles:
+    - monitoring

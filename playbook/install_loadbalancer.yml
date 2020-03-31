@@ -1,12 +1,11 @@
 ---
 - name: k8s base
   hosts:
-  - masters
-  - nodes
+  - lbs
   gather_facts: true
   become: true
   become_user: root
   become_method: sudo
   roles:
-    - kubernetes
+    - haproxy
 

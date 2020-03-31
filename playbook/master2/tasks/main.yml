@@ -15,16 +15,25 @@
     recurse: yes
     owner: root
     group: root
-    
+- file:
+    path: /etc/kubernetes/pki/etcd
+    state: directory
+    recurse: yes
+    owner: root
+    group: root
+
+
 - shell: |
-    cp /vagrant/k8s-pki/ca.crt /etc/kubernetes/pki
+    #cp /vagrant/k8s-pki/ca.crt /etc/kubernetes/pki
     cp /vagrant/k8s-pki/ca.key /etc/kubernetes/pki
     cp /vagrant/k8s-pki/sa.key /etc/kubernetes/pki
-    cp /vagrant/k8s-pki/sa.sub /etc/kubernetes/pki
+    cp /vagrant/k8s-pki/sa.pub /etc/kubernetes/pki
     cp /vagrant/k8s-pki/front-proxy-ca.crt /etc/kubernetes/pki
     cp /vagrant/k8s-pki/front-proxy-ca.key /etc/kubernetes/pki
     cp /vagrant/k8s-pki/etcd-ca.crt /etc/kubernetes/pki/etcd/ca.crt
     cp /vagrant/k8s-pki/etcd-ca.key /etc/kubernetes/pki/etcd/ca.key
+    #cp /vagrant/k8s-pki/etcd.crt /etc/kubernetes/pki/etcd/server.crt
+    #cp /vagrant/k8s-pki/etcd.key /etc/kubernetes/pki/etcd/server.key    
     cp /vagrant/k8s-pki/admin.conf /etc/kubernetes
     chown -R root:root /etc/kubernetes
     chmod 0600 /etc/kubernetes/pki/*
@@ -33,14 +42,50 @@
 
 ## k8sクラスタへマスターとして参加
 #
+
+
 - name: copy from home to local
   copy:
-    src: /vagrant/kubeadm-join-control.tmp
-    dest: /tmp/kubeadm-join-control.yaml
-- name: include kubeadm join token etc
-  include_vars: /tmp/kubeadm-join-control.yaml
-- name: kubeadm join
-  command: "{{ ctrl_join_command }}"  
+    src: "/vagrant/k8s-config/kubeadm-config-for-join.tmp"
+    dest: "/tmp/kubeadm-config.yaml"
+#- copy:
+#    src: "/vagrant/k8s-config/kubeadm-config-for-join.tmp"
+#    dest: "/tmp/kubeadm-join-master.yaml"
+
+- name: change IP address & hostname
+  replace:
+    dest: "/tmp/kubeadm-config.yaml"
+    regexp: '__NODE_IP_ADDR__'
+    replace: "{{ ansible_facts.enp0s8.ipv4.address }}"
+- replace:
+    dest: "/tmp/kubeadm-config.yaml"
+    regexp: '__NODE_HOSTNAME__'
+    replace: "{{ ansible_facts.hostname }}"
+- replace:
+    dest: "/tmp/kubeadm-config.yaml"
+    regexp: '__LB_IP_ADDR__'
+    replace: "172.16.2.21"
+
+- name: import token for join
+  include_vars: "/vagrant/k8s-config/token.yaml"
+- include_vars: "/vagrant/k8s-config/discovery-token-ca-cert-hash.yaml"
+- replace:
+    dest: "/tmp/kubeadm-config.yaml"
+    regexp: '__TOKEN__'
+    replace: "{{ token }}"
+
+
+#- name: include kubeadm join token etc
+#  #include_vars: "/tmp/kubeadm-join-master.yaml"
+#  include_vars: "/vagrant/k8s-config/kubeadm-join-master.tmp"
+- debug: msg="token = {{ token }}"
+#- debug: msg="discovery_token_ca_cert_hash = {{ discovery_token_ca_cert_hash }} "
+- debug: msg="kubeadm join --config /tmp/kubeadm-config.yaml --discovery-token-ca-cert-hash {{ discovery_token_ca_cert_hash }}"
+#- name: kubeadm join for control plane
+#  shell: kubeadm join --config /tmp/kubeadm-config.yaml --discovery-token-ca-cert-hash "{{ discovery_token_ca_cert_hash }}"
+
+- name: kubeadm join for control plane
+  shell: kubeadm join --config /tmp/kubeadm-config.yaml
 
 
 ## kubeletのDNSのIPアドレスを変更

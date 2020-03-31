@@ -3,27 +3,60 @@
 - name: "kubeadm reset v1.11 or later"
   command: kubeadm reset -f
 
+
+
 ## クラスタ参加用のコマンドを作成 Ubuntu
-- name: kubeadm init for Ubuntu
-  command: kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address={{ ansible_facts.enp0s8.ipv4.address }} --service-cidr=10.32.0.0/24
+
+- name: copy from home to local
+  copy:
+    src: "/vagrant/k8s-config/kubeadm-config.tmp"
+    dest: "/tmp/kubeadm-config.yaml"
+
+- name: change IP address & hostname
+  replace:
+    dest: "/tmp/kubeadm-config.yaml"
+    regexp: '__NODE_IP_ADDR__'
+    replace: "{{ ansible_facts.enp0s8.ipv4.address }}"
+- replace:
+    dest: "/tmp/kubeadm-config.yaml"
+    regexp: '__NODE_HOSTNAME__'
+    replace: "{{ ansible_facts.hostname }}"
+- replace:
+    dest: "/tmp/kubeadm-config.yaml"
+    regexp: '__LB_IP_ADDR__'
+    replace: "172.16.2.21"
+
+
+- command: kubeadm init --config=/tmp/kubeadm-config.yaml
   register: join_ubuntu
+  args:
+    chdir: /home/vagrant
   when:
     - ansible_facts.distribution == "Ubuntu"
 
-- debug: msg="{{ join_ubuntu }}"
+
+
+## Join用トークンを書き出す
+#- debug: msg="{{ join_ubuntu }}"
+- debug: msg="test ===== {{ join_ubuntu.stdout_lines[-2].split('--token')[1].split(' ')[1] }}"
+- debug: msg="test ===== {{ join_ubuntu.stdout_lines[-1].split('--discovery-token-ca-cert-hash')[1].split(' ')[1] }}"
+
+- name: Write discovery-token-ca-cert-hash and tls toke for other master nodes
+  shell: echo "token" ":" "{{ join_ubuntu.stdout_lines[-2].split('--token')[1].split(' ')[1] }}"  > /vagrant/k8s-config/token.yaml
+- shell: echo "discovery_token_ca_cert_hash" ":" {{ join_ubuntu.stdout_lines[-1].split('--discovery-token-ca-cert-hash')[1].split(' ')[1] }}  > /vagrant/k8s-config/discovery-token-ca-cert-hash.yaml
+
 
 ## k8sノード用コマンドを保存（マスターノード用）Ubuntu
-- name: create kubeadm join command for control plane
-  shell: echo "ctrl_join_command" ":" {{ join_ubuntu.stdout_lines[-2] }} {{ join_ubuntu.stdout_lines[-1] }} " --experimental-control-plane" > /tmp/kubeadm-join-control.yaml
-  when:
-    - ansible_facts.distribution == "Ubuntu"
+#- name: create kubeadm join command for control plane
+#  shell: echo "ctrl_join_command" ":" "{{ join_ubuntu.stdout_lines[-2] }} {{ join_ubuntu.stdout_lines[-1] }} --config=/tmp/kubeadm-config.yaml"  > /vagrant/k8s-config/kubeadm-join-master.tmp
+#  when:
+#    - ansible_facts.distribution == "Ubuntu"
 
 ## k8sノード用コマンドを保存（ワーカーノード用）Ubuntu
 - name: create kubeadm join command
-  shell: echo "join_command" ":" {{ join_ubuntu.stdout_lines[-2] }} {{ join_ubuntu.stdout_lines[-1] }} > /tmp/kubeadm-join.yaml
+  shell: echo "join_command" ":" {{ join_ubuntu.stdout_lines[-2] }} {{ join_ubuntu.stdout_lines[-1] }} > /vagrant/k8s-config/kubeadm-join.tmp
   when:
     - ansible_facts.distribution == "Ubuntu"
-
 
 
 ## クラスタ参加用のコマンドを作成 CentOS
@@ -35,17 +68,10 @@
     - ansible_facts.distribution == "CentOS"
 ## k8sノード用コマンドを保存 CentOS
 - name: create kubeadm join command
-  shell: echo "join_command" ":" {{ join_centos.stdout_lines[-2] }} {{ join_centos.stdout_lines[-1] }} > /tmp/kubeadm-join.yaml
+  shell: echo "join_command" ":" {{ join_centos.stdout_lines[-2] }} {{ join_centos.stdout_lines[-1] }} > /vagrant/kubeadm-join.yaml
   when:
     - ansible_facts.distribution == "CentOS"
 
-
-## vagrantのディレクトリへコピー
-##                                terraformを使う場合は修正
-- name: copy /tmp/kubeadm-join.yaml -> home
-  command: cp /tmp/kubeadm-join.yaml /vagrant/kubeadm-join.tmp
-- name: copy /tmp/kubeadm-join-control.yaml -> home
-  command: cp /tmp/kubeadm-join-control.yaml /vagrant/kubeadm-join-control.tmp
 
 ## Kubernetesの証明書をコピー
 ##
@@ -59,8 +85,9 @@
     cp /etc/kubernetes/pki/front-proxy-ca.key /vagrant/k8s-pki
     cp /etc/kubernetes/pki/etcd/ca.crt /vagrant/k8s-pki/etcd-ca.crt
     cp /etc/kubernetes/pki/etcd/ca.key /vagrant/k8s-pki/etcd-ca.key
+    cp /etc/kubernetes/pki/etcd/server.crt /vagrant/k8s-pki/etcd.crt
+    cp /etc/kubernetes/pki/etcd/server.key /vagrant/k8s-pki/etcd.key
     cp /etc/kubernetes/admin.conf /vagrant/k8s-pki
-
 
 
 ## kubeletのDNSのIPアドレスを変更

@@ -7,12 +7,21 @@
 #
 - name: copy from home to local
   copy:
-    src: /vagrant/kubeadm-join.tmp
+    src: /vagrant/k8s-config/kubeadm-join.tmp
     dest: /tmp/kubeadm-join.yaml
+
+#- name: include kubeadm join token etc
+#  include_vars: /tmp/kubeadm-join.yaml
+
 - name: include kubeadm join token etc
-  include_vars: /tmp/kubeadm-join.yaml
+  include_vars: /vagrant/k8s-config/kubeadm-join.tmp
+
+- debug: msg = "{{ join_command }}" 
+
 - name: kubeadm join
   command: "{{ join_command }}"  
+
+
 
 ## kubeletのDNSのIPアドレスを変更
 #

@@ -1,0 +1,37 @@
+##
+## コントロール・プレーン用
+##  HA-PROXY
+##
+- name: Install the prerequisite packeage for HA-PROXY
+  apt:
+    name: "{{ packages }}"
+    state: present
+    #update_cache: yes
+  vars:
+    packages:
+    - haproxy
+    - haproxy-doc
+    - haproxy-log-analysis
+    - haproxyctl
+    - hatop 
+  when:
+    - ansible_facts.distribution == "Ubuntu"
+
+- name: setup config
+  template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: just force systemd to reread configs (2.4 and above)
+  systemd:
+    daemon_reload: yes
+
+- name: start haproxy
+  systemd:
+    name: haproxy
+    state: restarted
+    enabled: yes
+

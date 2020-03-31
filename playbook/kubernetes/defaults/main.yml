@@ -2,8 +2,8 @@
 ---
 # どちらか一方を選んで、有効化してください。
 # Chose either one and enable it. docker-ce or containerd
-#container_engine: docker-ce
-container_engine: containerd
+container_engine: docker-ce
+#container_engine: containerd
 
 
 # Docker package version
