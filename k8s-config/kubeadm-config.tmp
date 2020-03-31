@@ -14,10 +14,10 @@ nodeRegistration:
 apiVersion: kubeadm.k8s.io/v1beta2
 kind: ClusterConfiguration
 kubernetesVersion: v1.16.8
-controlPlaneEndpoint: "__NODE_IP_ADDR__:6443"
+controlPlaneEndpoint: "__LB_IP_ADDR__:6443"
 apiServer:
   extraArgs:
-    advertise-address: __LB_IP_ADDR__
+    advertise-address: __NODE_IP_ADDR__
     allow-privileged: "true"
     authorization-mode: Node,RBAC
     client-ca-file: /etc/kubernetes/pki/ca.crt

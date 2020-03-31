@@ -4,6 +4,7 @@
   git:
     repo: 'https://github.com/kubernetes-sigs/metrics-server'
     dest: /home/vagrant/metrics-server
+    force: yes
   become_user: vagrant    
 
 - name: add a new line
