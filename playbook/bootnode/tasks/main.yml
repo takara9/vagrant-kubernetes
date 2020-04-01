@@ -18,7 +18,7 @@
     state: directory
     owner: vagrant
     group: vagrant
-    mode: '0755'
+    mode: '0777'
 
 - name: mkdir for ssh keys
   file:
@@ -26,7 +26,7 @@
     state: directory
     owner: vagrant
     group: vagrant
-    mode: '0755'
+    mode: '0777'
 
 - name: mkdir for cluster config & cert file
   file:
@@ -34,7 +34,7 @@
     state: directory
     owner: vagrant
     group: vagrant
-    mode: '0755'
+    mode: '0777'
 
 
 - name: mkdir for cluster config & cert file
@@ -43,7 +43,7 @@
     state: directory
     owner: vagrant
     group: vagrant
-    mode: '0755'
+    mode: '0777'
 
 - name: mkdir kubeconfig
   file:
@@ -51,7 +51,7 @@
     state: directory
     owner: vagrant
     group: vagrant
-    mode:  '0755'
+    mode:  '0777'
 
 
 - name: re-start nfs server
