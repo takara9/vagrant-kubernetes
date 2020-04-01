@@ -144,22 +144,22 @@
 
 ## flannelのコピー
 #
-- set_fact:
-    interface: enp0s8
-  when:
-    - ansible_facts.distribution == "Ubuntu"
-- set_fact:
-    interface: eth1
-  when:
-    - ansible_facts.distribution == "CentOS"
+#- set_fact:
+#    interface: enp0s8
+#  when:
+#    - ansible_facts.distribution == "Ubuntu"
+#- set_fact:
+#    interface: eth1
+#  when:
+#    - ansible_facts.distribution == "CentOS"
 
-- name: copy a manifest of Flannel for k8s ver > 11
-  template:
-    src:  kube-flannel.yml.j2
-    dest: /home/vagrant/kube-flannel.yml
-    mode: 0644
-    owner: vagrant
-    group: vagrant
+#- name: copy a manifest of Flannel for k8s ver > 11
+#  template:
+#    src:  kube-flannel.yml.j2
+#    dest: /home/vagrant/kube-flannel.yml
+#    mode: 0644
+#    owner: vagrant
+#    group: vagrant
 
 ## Flannelのデプロイ
 #
@@ -174,12 +174,12 @@
 #  wait_for:
 #    timeout: 20
 
-- name: Apply manifest for Flannel
-  k8s:
-    state: present
-    src: /home/vagrant/kube-flannel.yml
-    apply: yes
-    kubeconfig: /etc/kubernetes/admin.conf
+#- name: Apply manifest for Flannel
+#  k8s:
+#    state: present
+#    src: /home/vagrant/kube-flannel.yml
+#    apply: yes
+#    kubeconfig: /etc/kubernetes/admin.conf
 
 #  args:
 #    chdir: /home/vagrant

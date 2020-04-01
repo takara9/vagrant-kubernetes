@@ -1,12 +1,12 @@
 bootnode    ansible_connection=local
-master1     ansible_ssh_host=master1    ansible_ssh_private_key_file=/vagrant/keys/id_rsa
-master2     ansible_ssh_host=master2    ansible_ssh_private_key_file=/vagrant/keys/id_rsa
-master3     ansible_ssh_host=master3    ansible_ssh_private_key_file=/vagrant/keys/id_rsa
-mlb1        ansible_ssh_host=mlb1       ansible_ssh_private_key_file=/vagrant/keys/id_rsa
-mlb2        ansible_ssh_host=mlb2       ansible_ssh_private_key_file=/vagrant/keys/id_rsa
-node1       ansible_ssh_host=node1      ansible_ssh_private_key_file=/vagrant/keys/id_rsa
-node2       ansible_ssh_host=node2      ansible_ssh_private_key_file=/vagrant/keys/id_rsa
-node3       ansible_ssh_host=node3      ansible_ssh_private_key_file=/vagrant/keys/id_rsa
+master1     ansible_ssh_host=master1    ansible_ssh_private_key_file=/srv/k8s/keys/id_rsa
+master2     ansible_ssh_host=master2    ansible_ssh_private_key_file=/srv/k8s/keys/id_rsa
+master3     ansible_ssh_host=master3    ansible_ssh_private_key_file=/srv/k8s/keys/id_rsa
+mlb1        ansible_ssh_host=mlb1       ansible_ssh_private_key_file=/srv/k8s/keys/id_rsa
+mlb2        ansible_ssh_host=mlb2       ansible_ssh_private_key_file=/srv/k8s/keys/id_rsa
+node1       ansible_ssh_host=node1      ansible_ssh_private_key_file=/srv/k8s/keys/id_rsa
+node2       ansible_ssh_host=node2      ansible_ssh_private_key_file=/srv/k8s/keys/id_rsa
+node3       ansible_ssh_host=node3      ansible_ssh_private_key_file=/srv/k8s/keys/id_rsa
 
 [masters]
 master[1:3]
