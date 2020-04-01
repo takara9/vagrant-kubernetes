@@ -124,17 +124,18 @@
 
 ##  configファイルのコピー
 #
-- name: chmod admin.conf
-  file:
-    path:  /etc/kubernetes/admin.conf
-    owner: vagrant
-    group: vagrant
-    mode:  '0600'
+#- name: chmod admin.conf
+#  file:
+#    path:  /etc/kubernetes/admin.conf
+#    owner: vagrant
+#    group: vagrant
+#    mode:  '0600'
     
 - name: copy config to home dir
   copy:
     src:  /etc/kubernetes/admin.conf
     dest: /home/vagrant/.kube/config
+    remote_src: yes    
     owner: vagrant
     group: vagrant
     mode:  '0600'

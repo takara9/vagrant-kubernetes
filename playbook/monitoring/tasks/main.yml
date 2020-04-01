@@ -5,7 +5,7 @@
     repo: 'https://github.com/kubernetes-sigs/metrics-server'
     dest: /home/vagrant/metrics-server
     force: yes
-  become_user: vagrant    
+  #become_user: vagrant    
 
 - name: add a new line
   blockinfile:
@@ -16,9 +16,68 @@
                      - --kubelet-insecure-tls
                      - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
 
+#- name: Deploy Metrics Server
+#  command: kubectl apply -f metrics-server/deploy/kubernetes
+#  become_user: vagrant
+#  args:
+#    chdir: /home/vagrant
+#- name: Deploy Metrics Server
+#  k8s:
+#    state: present
+#    src: "{{ manifest_dir }}/aggregated-metrics-reader.yaml"
+#    apply: yes
+#    kubeconfig: /etc/kubernetes/admin.conf
+#vars:
+#    manifests:
+#    - "{{ manifest_dir }}/aggregated-metrics-reader.yaml"
+#    - "{{ manifest_dir }}/auth-delegator.yaml"
+#    - "{{ manifest_dir }}/auth-reader.yaml"
+#    - "{{ manifest_dir }}/metrics-apiservice.yaml"
+#    - "{{ manifest_dir }}/metrics-server-deployment.yaml"
+#    - "{{ manifest_dir }}/metrics-server-service.yaml"
+#    - "{{ manifest_dir }}/resource-reader.yaml"
+
+
 - name: Deploy Metrics Server
-  become_user: vagrant
-  command: kubectl apply -f /home/vagrant/metrics-server/deploy/kubernetes
+  k8s:
+    state: present
+    src: /home/vagrant/metrics-server/deploy/kubernetes/aggregated-metrics-reader.yaml
+    apply: yes
+    kubeconfig: /etc/kubernetes/admin.conf
+- k8s:
+    state: present
+    src: /home/vagrant/metrics-server/deploy/kubernetes/auth-delegator.yaml
+    apply: yes
+    kubeconfig: /etc/kubernetes/admin.conf
+- k8s:
+    state: present
+    src: /home/vagrant/metrics-server/deploy/kubernetes/auth-reader.yaml
+    apply: yes
+    kubeconfig: /etc/kubernetes/admin.conf
+- k8s:
+    state: present
+    src: /home/vagrant/metrics-server/deploy/kubernetes/metrics-apiservice.yaml
+    apply: yes
+    kubeconfig: /etc/kubernetes/admin.conf
+- k8s:
+    state: present
+    src: /home/vagrant/metrics-server/deploy/kubernetes/metrics-server-deployment.yaml
+    apply: yes
+    kubeconfig: /etc/kubernetes/admin.conf
+- k8s:
+    state: present
+    src: /home/vagrant/metrics-server/deploy/kubernetes/metrics-server-service.yaml
+    apply: yes
+    kubeconfig: /etc/kubernetes/admin.conf
+- k8s:
+    state: present
+    src: /home/vagrant/metrics-server/deploy/kubernetes/resource-reader.yaml
+    apply: yes
+    kubeconfig: /etc/kubernetes/admin.conf
+
+
+
+
 
 ## Dashboard UI インストール
 #
@@ -36,13 +95,23 @@
     regexp: '^  name: kubernetes-dashboard'
     replace: '  name: cluster-admin'
 - name: Deploy Dashboard UI
-  become_user: vagrant
-  command: kubectl apply -f /home/vagrant/recommended.yaml
+#  become_user: vagrant
+#  command: kubectl apply -f /home/vagrant/recommended.yaml
+  k8s:
+    state: present
+    src: /home/vagrant/recommended.yaml
+    apply: yes
+    kubeconfig: /etc/kubernetes/admin.conf
+
+
 - name: setup kubeconfig
   become_user: vagrant    
   shell: |
+        KUBECONFIG=/etc/kubernetes/admin.conf 
         TOKEN=$(kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret |grep kubernetes-dashboard-token-* | awk '{print $1}') |awk '$1=="token:"{print $2}')
         kubectl config set-credentials kubernetes-admin --token="${TOKEN}"
+
+
 - name: copy config to host dir
   copy:
     src:  /home/vagrant/.kube/config

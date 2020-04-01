@@ -126,17 +126,18 @@
 
 ##  configファイルのコピー
 #
-- name: chmod admin.conf
-  file:
-    path:  /etc/kubernetes/admin.conf
-    owner: vagrant
-    group: vagrant
-    mode:  '0600'
+#- name: chmod admin.conf
+#  file:
+#    path:  /etc/kubernetes/admin.conf
+#    owner: vagrant
+#    group: vagrant
+#    mode:  '0600'
     
 - name: copy config to home dir
   copy:
     src:  /etc/kubernetes/admin.conf
     dest: /home/vagrant/.kube/config
+    remote_src: yes
     owner: vagrant
     group: vagrant
     mode:  '0600'
@@ -162,12 +163,27 @@
 
 ## Flannelのデプロイ
 #
-- name: Deploy Flannel
-  shell: |
-        kubectl apply -f kube-flannel.yml
-  args:
-    chdir: /home/vagrant
-  become_user: vagrant
+#- name: Deploy Flannel
+#  shell: |
+#    kubectl apply -f kube-flannel.yml > /home/vagrant/kubectl_apply_flannel.log
+#  args:
+#    chdir: /home/vagrant
+#  become_user: vagrant
+
+#- name: sleep for 20 seconds and continue with play
+#  wait_for:
+#    timeout: 20
+
+- name: Apply manifest for Flannel
+  k8s:
+    state: present
+    src: /home/vagrant/kube-flannel.yml
+    apply: yes
+    kubeconfig: /etc/kubernetes/admin.conf
+
+#  args:
+#    chdir: /home/vagrant
+#  become_user: vagrant
 
 
 
