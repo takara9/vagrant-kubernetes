@@ -9,7 +9,7 @@
 
 - name: copy from home to local
   copy:
-    src: "/vagrant/k8s-config/kubeadm-config.tmp"
+    src: "/mnt/k8s-config/kubeadm-config.tmp"
     dest: "/tmp/kubeadm-config.yaml"
 
 - name: change IP address & hostname
@@ -42,19 +42,19 @@
 - debug: msg="test ===== {{ join_ubuntu.stdout_lines[-1].split('--discovery-token-ca-cert-hash')[1].split(' ')[1] }}"
 
 - name: Write discovery-token-ca-cert-hash and tls toke for other master nodes
-  shell: echo "token" ":" "{{ join_ubuntu.stdout_lines[-2].split('--token')[1].split(' ')[1] }}"  > /vagrant/k8s-config/token.yaml
-- shell: echo "discovery_token_ca_cert_hash" ":" {{ join_ubuntu.stdout_lines[-1].split('--discovery-token-ca-cert-hash')[1].split(' ')[1] }}  > /vagrant/k8s-config/discovery-token-ca-cert-hash.yaml
+  shell: echo "token" ":" "{{ join_ubuntu.stdout_lines[-2].split('--token')[1].split(' ')[1] }}"  > /mnt/k8s-config/token.yaml
+- shell: echo "discovery_token_ca_cert_hash" ":" {{ join_ubuntu.stdout_lines[-1].split('--discovery-token-ca-cert-hash')[1].split(' ')[1] }}  > /mnt/k8s-config/discovery-token-ca-cert-hash.yaml
 
 
 ## k8sノード用コマンドを保存（マスターノード用）Ubuntu
 #- name: create kubeadm join command for control plane
-#  shell: echo "ctrl_join_command" ":" "{{ join_ubuntu.stdout_lines[-2] }} {{ join_ubuntu.stdout_lines[-1] }} --config=/tmp/kubeadm-config.yaml"  > /vagrant/k8s-config/kubeadm-join-master.tmp
+#  shell: echo "ctrl_join_command" ":" "{{ join_ubuntu.stdout_lines[-2] }} {{ join_ubuntu.stdout_lines[-1] }} --config=/tmp/kubeadm-config.yaml"  > /mnt/k8s-config/kubeadm-join-master.tmp
 #  when:
 #    - ansible_facts.distribution == "Ubuntu"
 
 ## k8sノード用コマンドを保存（ワーカーノード用）Ubuntu
 - name: create kubeadm join command
-  shell: echo "join_command" ":" {{ join_ubuntu.stdout_lines[-2] }} {{ join_ubuntu.stdout_lines[-1] }} > /vagrant/k8s-config/kubeadm-join.tmp
+  shell: echo "join_command" ":" {{ join_ubuntu.stdout_lines[-2] }} {{ join_ubuntu.stdout_lines[-1] }} > /mnt/k8s-config/kubeadm-join.tmp
   when:
     - ansible_facts.distribution == "Ubuntu"
 
@@ -68,7 +68,7 @@
     - ansible_facts.distribution == "CentOS"
 ## k8sノード用コマンドを保存 CentOS
 - name: create kubeadm join command
-  shell: echo "join_command" ":" {{ join_centos.stdout_lines[-2] }} {{ join_centos.stdout_lines[-1] }} > /vagrant/kubeadm-join.yaml
+  shell: echo "join_command" ":" {{ join_centos.stdout_lines[-2] }} {{ join_centos.stdout_lines[-1] }} > /mnt/kubeadm-join.yaml
   when:
     - ansible_facts.distribution == "CentOS"
 
@@ -77,17 +77,17 @@
 ##
 - name: copy kubernetes pki files to vagrant host
   shell: |
-    cp /etc/kubernetes/pki/ca.crt /vagrant/k8s-pki
-    cp /etc/kubernetes/pki/ca.key /vagrant/k8s-pki
-    cp /etc/kubernetes/pki/sa.key /vagrant/k8s-pki
-    cp /etc/kubernetes/pki/sa.pub /vagrant/k8s-pki
-    cp /etc/kubernetes/pki/front-proxy-ca.crt /vagrant/k8s-pki
-    cp /etc/kubernetes/pki/front-proxy-ca.key /vagrant/k8s-pki
-    cp /etc/kubernetes/pki/etcd/ca.crt /vagrant/k8s-pki/etcd-ca.crt
-    cp /etc/kubernetes/pki/etcd/ca.key /vagrant/k8s-pki/etcd-ca.key
-    cp /etc/kubernetes/pki/etcd/server.crt /vagrant/k8s-pki/etcd.crt
-    cp /etc/kubernetes/pki/etcd/server.key /vagrant/k8s-pki/etcd.key
-    cp /etc/kubernetes/admin.conf /vagrant/k8s-pki
+    cp /etc/kubernetes/pki/ca.crt /mnt/k8s-pki
+    cp /etc/kubernetes/pki/ca.key /mnt/k8s-pki
+    cp /etc/kubernetes/pki/sa.key /mnt/k8s-pki
+    cp /etc/kubernetes/pki/sa.pub /mnt/k8s-pki
+    cp /etc/kubernetes/pki/front-proxy-ca.crt /mnt/k8s-pki
+    cp /etc/kubernetes/pki/front-proxy-ca.key /mnt/k8s-pki
+    cp /etc/kubernetes/pki/etcd/ca.crt /mnt/k8s-pki/etcd-ca.crt
+    cp /etc/kubernetes/pki/etcd/ca.key /mnt/k8s-pki/etcd-ca.key
+    cp /etc/kubernetes/pki/etcd/server.crt /mnt/k8s-pki/etcd.crt
+    cp /etc/kubernetes/pki/etcd/server.key /mnt/k8s-pki/etcd.key
+    cp /etc/kubernetes/admin.conf /mnt/k8s-pki
 
 
 ## kubeletのDNSのIPアドレスを変更
@@ -116,13 +116,13 @@
     group: vagrant
     mode:  '0755'
 
-- name: mkdir /vagrant/kubeconfig
-  file:
-    path:  /vagrant/kubeconfig
-    state: directory
-    owner: vagrant
-    group: vagrant
-    mode:  '0755'
+#- name: mkdir /vagrant/kubeconfig
+#  file:
+#    path:  /vagrant/kubeconfig
+#    state: directory
+#    owner: vagrant
+#    group: vagrant
+#    mode:  '0755'
 
 ##  configファイルのコピー
 #

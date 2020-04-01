@@ -24,17 +24,17 @@
 
 
 - shell: |
-    #cp /vagrant/k8s-pki/ca.crt /etc/kubernetes/pki
-    cp /vagrant/k8s-pki/ca.key /etc/kubernetes/pki
-    cp /vagrant/k8s-pki/sa.key /etc/kubernetes/pki
-    cp /vagrant/k8s-pki/sa.pub /etc/kubernetes/pki
-    cp /vagrant/k8s-pki/front-proxy-ca.crt /etc/kubernetes/pki
-    cp /vagrant/k8s-pki/front-proxy-ca.key /etc/kubernetes/pki
-    cp /vagrant/k8s-pki/etcd-ca.crt /etc/kubernetes/pki/etcd/ca.crt
-    cp /vagrant/k8s-pki/etcd-ca.key /etc/kubernetes/pki/etcd/ca.key
-    #cp /vagrant/k8s-pki/etcd.crt /etc/kubernetes/pki/etcd/server.crt
-    #cp /vagrant/k8s-pki/etcd.key /etc/kubernetes/pki/etcd/server.key    
-    cp /vagrant/k8s-pki/admin.conf /etc/kubernetes
+    #cp /mnt/k8s-pki/ca.crt /etc/kubernetes/pki
+    cp /mnt/k8s-pki/ca.key /etc/kubernetes/pki
+    cp /mnt/k8s-pki/sa.key /etc/kubernetes/pki
+    cp /mnt/k8s-pki/sa.pub /etc/kubernetes/pki
+    cp /mnt/k8s-pki/front-proxy-ca.crt /etc/kubernetes/pki
+    cp /mnt/k8s-pki/front-proxy-ca.key /etc/kubernetes/pki
+    cp /mnt/k8s-pki/etcd-ca.crt /etc/kubernetes/pki/etcd/ca.crt
+    cp /mnt/k8s-pki/etcd-ca.key /etc/kubernetes/pki/etcd/ca.key
+    #cp /mnt/k8s-pki/etcd.crt /etc/kubernetes/pki/etcd/server.crt
+    #cp /mnt/k8s-pki/etcd.key /etc/kubernetes/pki/etcd/server.key    
+    cp /mnt/k8s-pki/admin.conf /etc/kubernetes
     chown -R root:root /etc/kubernetes
     chmod 0600 /etc/kubernetes/pki/*
     chmod 0644 /etc/kubernetes/pki/*.crt
@@ -46,10 +46,10 @@
 
 - name: copy from home to local
   copy:
-    src: "/vagrant/k8s-config/kubeadm-config-for-join.tmp"
+    src: "/mnt/k8s-config/kubeadm-config-for-join.tmp"
     dest: "/tmp/kubeadm-config.yaml"
 #- copy:
-#    src: "/vagrant/k8s-config/kubeadm-config-for-join.tmp"
+#    src: "/mnt/k8s-config/kubeadm-config-for-join.tmp"
 #    dest: "/tmp/kubeadm-join-master.yaml"
 
 - name: change IP address & hostname
@@ -67,8 +67,8 @@
     replace: "172.16.2.21"
 
 - name: import token for join
-  include_vars: "/vagrant/k8s-config/token.yaml"
-- include_vars: "/vagrant/k8s-config/discovery-token-ca-cert-hash.yaml"
+  include_vars: "/mnt/k8s-config/token.yaml"
+- include_vars: "/mnt/k8s-config/discovery-token-ca-cert-hash.yaml"
 - replace:
     dest: "/tmp/kubeadm-config.yaml"
     regexp: '__TOKEN__'
@@ -77,7 +77,7 @@
 
 #- name: include kubeadm join token etc
 #  #include_vars: "/tmp/kubeadm-join-master.yaml"
-#  include_vars: "/vagrant/k8s-config/kubeadm-join-master.tmp"
+#  include_vars: "/mnt/k8s-config/kubeadm-join-master.tmp"
 - debug: msg="token = {{ token }}"
 #- debug: msg="discovery_token_ca_cert_hash = {{ discovery_token_ca_cert_hash }} "
 - debug: msg="kubeadm join --config /tmp/kubeadm-config.yaml --discovery-token-ca-cert-hash {{ discovery_token_ca_cert_hash }}"
@@ -114,13 +114,13 @@
     group: vagrant
     mode:  '0755'
 
-- name: mkdir /vagrant/kubeconfig
-  file:
-    path:  /vagrant/kubeconfig
-    state: directory
-    owner: vagrant
-    group: vagrant
-    mode:  '0755'
+#- name: mkdir /vagrant/kubeconfig
+#  file:
+#    path:  /vagrant/kubeconfig
+#    state: directory
+#    owner: vagrant
+#    group: vagrant
+#    mode:  '0755'
 
 ##  configファイルのコピー
 #

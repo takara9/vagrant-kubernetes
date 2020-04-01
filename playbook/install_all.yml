@@ -33,6 +33,16 @@
   - bootnode
   gather_facts: true
   tasks:
+
+    - name: copy config to home dir
+      copy:
+        src:  /mnt/k8s-config/admin.conf
+        dest: /home/vagrant/.kube/config
+        remote_src: yes    
+        owner: vagrant
+        group: vagrant
+        mode:  '0600'
+
     ## flannelのコピー
     #
     - set_fact:

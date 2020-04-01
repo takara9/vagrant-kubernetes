@@ -36,6 +36,14 @@
     group: vagrant
     mode: '0755'
 
+- name: mkdir for cluster config & cert file
+  file:
+    path:  /srv/k8s/k8s-pki
+    state: directory
+    owner: vagrant
+    group: vagrant
+    mode: '0755'
+
 - name: mkdir kubeconfig
   file:
     path:  /srv/k8s/kubeconfig
