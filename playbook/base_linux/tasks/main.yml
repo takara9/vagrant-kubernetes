@@ -21,15 +21,15 @@
   args:
     chdir: /root
   when:
-    - ansible_facts.hostname == "master1"
+    - ansible_facts.hostname == "bootnode"
 - name: Copy id_rsa.pub to /vagrant/keys
   command: cp "/root/.ssh/id_rsa.pub" /vagrant/keys/id_rsa.pub
   when:
-    - ansible_facts.hostname == "master1"
+    - ansible_facts.hostname == "bootnode"
 - name: Copy id_rsa.pub to /vagrant/keys
   command: cp "/root/.ssh/id_rsa" /vagrant/keys/id_rsa
   when:
-    - ansible_facts.hostname == "master1"
+    - ansible_facts.hostname == "bootnode"
 
 - name: Create authorized_keys
   command: cp /vagrant/keys/id_rsa.pub  /root/.ssh/authorized_keys
@@ -89,4 +89,20 @@
      cat /vagrant/keys/id_rsa.pub >> /home/{{ cluster_admin }}/.ssh/authorized_keys
 
 
+#####
+- name: Install nfs-common
+  apt:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+    - nfs-common
+
+- name: Mount up
+  mount:
+    path: /mnt
+    src: bootnode:/srv/k8s
+    fstype: nfs
+    state: mounted
+    
 

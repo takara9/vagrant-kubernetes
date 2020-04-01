@@ -11,8 +11,8 @@ node3       ansible_ssh_host=node3      ansible_ssh_private_key_file=/vagrant/ke
 [masters]
 master[1:3]
 
-[lbs]
-lb[1:2]
+[mlbs]
+mlb[1:2]
 
 [nodes]
 node[1:3]
