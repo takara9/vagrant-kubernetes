@@ -11,7 +11,7 @@
 
 - name: HA-PROXY install
   hosts:
-  - lbs
+  - mlbs
   gather_facts: true
   become: true
   become_user: root
