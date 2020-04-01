@@ -7,14 +7,6 @@
     packages:
     - nfs-common
 
-- name: Mount up
-  mount:
-    path: /mnt
-    src: bootnode:/srv/k8s
-    fstype: nfs
-    state: mounted
-    
-
 - name: Ensure /etc/hosts
   template:
     src: hosts.j2
@@ -23,7 +15,13 @@
     group: root
     mode: '0644'
 
-
+- name: Mount up
+  mount:
+    path: /mnt
+    src: bootnode:/srv/k8s
+    fstype: nfs
+    state: mounted
+    
 #############################
 
 - name: Ensure group 'admin' exists
