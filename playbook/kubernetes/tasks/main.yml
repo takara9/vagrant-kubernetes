@@ -1,5 +1,8 @@
 # Master と Workerで共通のタスク
 #- debug: msg="{{ ansible_facts }}"
+- debug: msg="Kubernetes version = {{ kubernetes_version }}"
+
+- include_tasks: tasks/test.yml
 
 ##################################################
 ##  Linux Distributionの設定

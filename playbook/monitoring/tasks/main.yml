@@ -16,11 +16,12 @@
                      - --kubelet-insecure-tls
                      - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
 
-#- name: Deploy Metrics Server
-#  command: kubectl apply -f metrics-server/deploy/kubernetes
-#  become_user: vagrant
-#  args:
-#    chdir: /home/vagrant
+- name: Deploy Metrics Server
+  command: kubectl apply -f metrics-server/deploy/kubernetes
+  become_user: vagrant
+  args:
+    chdir: /home/vagrant
+
 #- name: Deploy Metrics Server
 #  k8s:
 #    state: present
@@ -38,42 +39,42 @@
 #    - "{{ manifest_dir }}/resource-reader.yaml"
 
 
-- name: Deploy Metrics Server
-  k8s:
-    state: present
-    src: /home/vagrant/metrics-server/deploy/kubernetes/aggregated-metrics-reader.yaml
-    apply: yes
-    kubeconfig: /etc/kubernetes/admin.conf
-- k8s:
-    state: present
-    src: /home/vagrant/metrics-server/deploy/kubernetes/auth-delegator.yaml
-    apply: yes
-    kubeconfig: /etc/kubernetes/admin.conf
-- k8s:
-    state: present
-    src: /home/vagrant/metrics-server/deploy/kubernetes/auth-reader.yaml
-    apply: yes
-    kubeconfig: /etc/kubernetes/admin.conf
-- k8s:
-    state: present
-    src: /home/vagrant/metrics-server/deploy/kubernetes/metrics-apiservice.yaml
-    apply: yes
-    kubeconfig: /etc/kubernetes/admin.conf
-- k8s:
-    state: present
-    src: /home/vagrant/metrics-server/deploy/kubernetes/metrics-server-deployment.yaml
-    apply: yes
-    kubeconfig: /etc/kubernetes/admin.conf
-- k8s:
-    state: present
-    src: /home/vagrant/metrics-server/deploy/kubernetes/metrics-server-service.yaml
-    apply: yes
-    kubeconfig: /etc/kubernetes/admin.conf
-- k8s:
-    state: present
-    src: /home/vagrant/metrics-server/deploy/kubernetes/resource-reader.yaml
-    apply: yes
-    kubeconfig: /etc/kubernetes/admin.conf
+#- name: Deploy Metrics Server
+#  k8s:
+#    state: present
+#    src: /home/vagrant/metrics-server/deploy/kubernetes/aggregated-metrics-reader.yaml
+#    apply: yes
+#    kubeconfig: /etc/kubernetes/admin.conf
+#- k8s:
+#    state: present
+#    src: /home/vagrant/metrics-server/deploy/kubernetes/auth-delegator.yaml
+#    apply: yes
+#    kubeconfig: /etc/kubernetes/admin.conf
+#- k8s:
+#    state: present
+#    src: /home/vagrant/metrics-server/deploy/kubernetes/auth-reader.yaml
+#    apply: yes
+#    kubeconfig: /etc/kubernetes/admin.conf
+#- k8s:
+#    state: present
+#    src: /home/vagrant/metrics-server/deploy/kubernetes/metrics-apiservice.yaml
+#    apply: yes
+#    kubeconfig: /etc/kubernetes/admin.conf
+#- k8s:
+#    state: present
+#    src: /home/vagrant/metrics-server/deploy/kubernetes/metrics-server-deployment.yaml
+#    apply: yes
+#    kubeconfig: /etc/kubernetes/admin.conf
+#- k8s:
+#    state: present
+#    src: /home/vagrant/metrics-server/deploy/kubernetes/metrics-server-service.yaml
+#    apply: yes
+#    kubeconfig: /etc/kubernetes/admin.conf
+#- k8s:
+#    state: present
+#    src: /home/vagrant/metrics-server/deploy/kubernetes/resource-reader.yaml
+#    apply: yes
+#    kubeconfig: /etc/kubernetes/admin.conf
 
 
 
@@ -95,13 +96,13 @@
     regexp: '^  name: kubernetes-dashboard'
     replace: '  name: cluster-admin'
 - name: Deploy Dashboard UI
-#  become_user: vagrant
-#  command: kubectl apply -f /home/vagrant/recommended.yaml
-  k8s:
-    state: present
-    src: /home/vagrant/recommended.yaml
-    apply: yes
-    kubeconfig: /etc/kubernetes/admin.conf
+  become_user: vagrant
+  command: kubectl apply -f /home/vagrant/recommended.yaml
+#  k8s:
+#    state: present
+#    src: /home/vagrant/recommended.yaml
+#    apply: yes
+#    kubeconfig: /etc/kubernetes/admin.conf
 
 
 - name: setup kubeconfig
@@ -111,11 +112,10 @@
         TOKEN=$(kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret |grep kubernetes-dashboard-token-* | awk '{print $1}') |awk '$1=="token:"{print $2}')
         kubectl config set-credentials kubernetes-admin --token="${TOKEN}"
 
-
-- name: copy config to host dir
-  copy:
-    src:  /home/vagrant/.kube/config
-    dest: /vagrant/kubeconfig/config
-    owner: vagrant
-    group: vagrant
-    mode:  '0600'
+#- name: copy config to host dir
+#  copy:
+#    src:  /home/vagrant/.kube/config
+#    dest: /vagrant/kubeconfig/config
+#    owner: vagrant
+#    group: vagrant
+#    mode:  '0600'
