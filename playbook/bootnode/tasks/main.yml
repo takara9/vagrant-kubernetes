@@ -36,22 +36,6 @@
     group: vagrant
     mode: '0755'
 
-- name: copy config template for join
-  copy:
-    src:  /home/vagrant/k8s/k8s-config/kubeadm-config-for-join.tmp
-    dest: /srv/k8s/k8s-config/kubeadm-config-for-join.tmp
-    owner: vagrant
-    group: vagrant
-    mode: '0644'
-
-- name: copy config template for init
-  copy:
-    src:  /home/vagrant/k8s/k8s-config/kubeadm-config.tmp
-    dest: /srv/k8s/k8s-config/kubeadm-config.tmp
-    owner: vagrant
-    group: vagrant
-    mode: '0644'
-
 
 - name: mkdir for cluster config & cert file
   file:
@@ -85,6 +69,8 @@
     mode: '0644'
 - command: exportfs -a
 
+
+#############################
 - name: Install ansible code from git repo
   git:
     repo: https://github.com/takara9/vagrant-kubernetes
@@ -93,6 +79,23 @@
     force: yes
     update: yes
   become_user: vagrant    
+
+- name: copy config template for join
+  copy:
+    src:  /home/vagrant/k8s/k8s-config/kubeadm-config-for-join.tmp
+    dest: /srv/k8s/k8s-config/kubeadm-config-for-join.tmp
+    owner: vagrant
+    group: vagrant
+    mode: '0644'
+
+- name: copy config template for init
+  copy:
+    src:  /home/vagrant/k8s/k8s-config/kubeadm-config.tmp
+    dest: /srv/k8s/k8s-config/kubeadm-config.tmp
+    owner: vagrant
+    group: vagrant
+    mode: '0644'
+
 
 #############################
 - name: mkdir .ssh directory
