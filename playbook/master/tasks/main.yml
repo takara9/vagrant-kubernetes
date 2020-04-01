@@ -135,7 +135,7 @@
     
 - name: copy config to home dir
   copy:
-    src:  /etc/kubernetes/admin.conf
+    src:  /mnt/k8s-pki/admin.conf
     dest: /home/vagrant/.kube/config
     remote_src: yes
     owner: vagrant
