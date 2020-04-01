@@ -34,6 +34,16 @@
   gather_facts: true
   tasks:
 
+    ## kubeconfigディレクトリ作成
+    #
+    - name: mkdir kubeconfig
+      file:
+        path:  /home/vagrant/.kube
+        state: directory
+        owner: vagrant
+        group: vagrant
+        mode:  '0755'
+
     - name: copy config to home dir
       copy:
         src:  /mnt/k8s-pki/admin.conf

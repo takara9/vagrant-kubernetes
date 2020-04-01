@@ -88,7 +88,8 @@
     cp /etc/kubernetes/pki/etcd/server.crt /mnt/k8s-pki/etcd.crt
     cp /etc/kubernetes/pki/etcd/server.key /mnt/k8s-pki/etcd.key
     cp /etc/kubernetes/admin.conf /mnt/k8s-pki
-
+    chown vagrant:vagrant /mnt/k8s-pki/*
+    chmod 0644 /mnt/k8s-pki/*
 
 ## kubeletのDNSのIPアドレスを変更
 #
