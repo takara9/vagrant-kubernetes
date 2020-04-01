@@ -1,1 +1,2 @@
 cluster_admin:  vagrant
+shared_fs: /mnt

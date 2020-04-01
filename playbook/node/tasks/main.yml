@@ -7,14 +7,14 @@
 #
 - name: copy from home to local
   copy:
-    src: /vagrant/k8s-config/kubeadm-join.tmp
+    src: /mntk8s-config/kubeadm-join.tmp
     dest: /tmp/kubeadm-join.yaml
 
 #- name: include kubeadm join token etc
 #  include_vars: /tmp/kubeadm-join.yaml
 
 - name: include kubeadm join token etc
-  include_vars: /vagrant/k8s-config/kubeadm-join.tmp
+  include_vars: /mnt/k8s-config/kubeadm-join.tmp
 
 - debug: msg = "{{ join_command }}" 
 

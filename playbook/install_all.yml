@@ -47,7 +47,7 @@
     - node
 
 - name: K8s Monitoring setup
-  hosts: master1
+  hosts: bootnode
   gather_facts: true
   become: true
   roles:

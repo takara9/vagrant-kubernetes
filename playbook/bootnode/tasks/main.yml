@@ -1,0 +1,108 @@
+#
+# ブートノードの設定
+#
+#- debug: msg="{{ ansible_facts.hostname }}"
+
+- name: Install a list
+  apt:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+    - nfs-kernel-server
+    - emacs-nox
+
+- name: mkdir for nfs exports
+  file:
+    path:  /srv/k8s
+    state: directory
+    owner: vagrant
+    group: vagrant
+    mode: '0755'
+
+- name: mkdir for ssh keys
+  file:
+    path:  /srv/k8s/keys
+    state: directory
+    owner: vagrant
+    group: vagrant
+    mode: '0755'
+
+- name: mkdir for cluster config & cert file
+  file:
+    path:  /srv/k8s/k8s-config
+    state: directory
+    owner: vagrant
+    group: vagrant
+    mode: '0755'
+
+- name: mkdir kubeconfig
+  file:
+    path:  /srv/k8s/kubeconfig
+    state: directory
+    owner: vagrant
+    group: vagrant
+    mode:  '0755'
+
+
+- name: re-start nfs server
+  systemd:
+    name: nfs-server
+    state: started
+    enabled: yes
+
+- name: install nfs exports
+  template:
+    src: exports.j2
+    dest: /etc/exports
+    owner: root
+    group: root
+    mode: '0644'
+- command: exportfs -a
+
+- name: Install ansible code from git repo
+  git:
+    repo: https://github.com/takara9/vagrant-kubernetes
+    dest: /home/vagrant/k8s
+    version: k8s_tm
+    force: yes
+    update: yes
+  become_user: vagrant    
+
+#############################
+- name: mkdir .ssh directory
+  file:
+    path: "/root/.ssh"
+    state: directory
+    owner: root
+    group: root
+    mode: '0700'
+- name: keygen
+  command: ssh-keygen -t rsa -N '' -f .ssh/id_rsa
+  args:
+    chdir: /root
+    
+- name: Copy id_rsa.pub to  shared_fs keys
+  command: cp /root/.ssh/id_rsa.pub /srv/k8s/keys/id_rsa.pub
+- file:
+    path: /srv/k8s/keys/id_rsa.pub
+    owner: root
+    group: root
+    mode: '0444'
+- name: Copy id_rsa to  shared_fs/keys
+  command: cp /root/.ssh/id_rsa /srv/k8s/keys/id_rsa
+- file:
+    path: /srv/k8s/keys/id_rsa
+    owner: root
+    group: root
+    mode: '0444'
+
+- name: Create authorized_keys
+  command: cp /srv/k8s/keys/id_rsa.pub  /root/.ssh/authorized_keys
+- file:
+    path: /root/.ssh/authorized_keys
+    owner: root
+    group: root
+    mode: '0400'
+
+
