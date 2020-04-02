@@ -38,6 +38,14 @@
   #when:
     #- ansible_facts.distribution == "Ubuntu"
     #- container_engine == "containerd"
+- name: Add the overlay
+  modprobe:
+    name:  overlay
+    state: present
+  #when:
+    #- ansible_facts.distribution == "Ubuntu"
+    #- container_engine == "containerd"
+
 - name: Set sysctl bridge
   sysctl:
     name: net.bridge.bridge-nf-call-iptables
@@ -147,6 +155,17 @@
 ##  Containerd のインストール
 ###################################################
 
+- name: setup containerd.conf
+  template:
+    src: containerd.conf
+    dest: /etc/modules-load.d/containerd.conf
+    owner: root
+    group: root
+    mode: '0644'
+  when:
+    - ansible_facts.distribution == "Ubuntu"
+    - container_engine == "containerd"
+    
 - name: Install the prerequisite packeage 2
   apt:
     name: "{{ packages }}"
@@ -171,6 +190,24 @@
   when:
     #- ansible_facts.distribution == "Ubuntu"
     - container_engine == "containerd"
+
+- name: mkdir for nfs exports
+  file:
+    path:  /etc/containerd
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  when:
+    #- ansible_facts.distribution == "Ubuntu"
+    - container_engine == "containerd"
+
+- name: create containerd config
+  shell: containerd config default > /etc/containerd/config.toml
+  when:
+    #- ansible_facts.distribution == "Ubuntu"
+    - container_engine == "containerd"
+
 
 ################################################### CentOS
 - name: ensure a list of packages installed
