@@ -6,7 +6,7 @@
   hosts:
   - bootnode
   tasks:
-    - name downloading 
+    - name: downloading 
       get_url:
         url: https://storage.googleapis.com/cri-containerd-release/cri-containerd-{{ containerd_version }}.linux-amd64.tar.gz
         dest: /srv/k8s/download/cri-containerd-{{ containerd_version }}.linux-amd64.tar.gz
