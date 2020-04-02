@@ -34,6 +34,7 @@ containerd_version="1.2.13"
 # Kubernetes package version
 k8s_version_ubuntu="=1.16.8-00"
 k8s_version_centos="1.16.8-0"
+kubernetes_version=k8s_version_ubuntu
 
 # Shared filesystem
 shared_fs=/mnt
