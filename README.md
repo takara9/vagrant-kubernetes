@@ -1,79 +1,65 @@
-# vagrant-kubernetes
+# Kubernetes HA
 
-この Vagrant と Ansible のコードは、学習用のマルチノードの Kubernetes 環境を自動構築するためのものです。起動の様子をYouTubeに登録しましたので、実施前にイメージを掴んて頂けると思います。 https://www.youtube.com/watch?v=ajU5iwy4-eg
+学習用のマルチマスター ＆ マルチノードの Kubernetes 環境を構築するためのものです。
 
-vagrant コマンドからクラスタを起動することで、パソコン上に仮想サーバー３台が起動して、Kuberetesの環境を
-自動設定します。起動後は、kubectl コマンドで利用することができます。
-
-1. master 172.16.20.11
-1. node1  172.16.20.12
-1. node2  172.16.20.13
+注意：動作確認が出来ていません。少々改善点するべき点が残っています。
 
 
-## このクラスタを起動するために必要なソフトウェア
+## 起動方法
 
-このコードを利用するためには、次のソフトウェアをインストールしていなければなりません。
+~~~
+git clone https://xxx  yyy
+cd yyy
+vagrant up
+vagrant ssh bootnode
+ansible -i hosts_k8s all -m ping
+ansible-playbook -i hosts_k8s playbook/install_all.yml
+~~~
+
+## この必要なソフトウェア
+
+次のソフトウェアをインストールしていなければなりません。
 
 * Vagrant (https://www.vagrantup.com/)
 * VirtualBox (https://www.virtualbox.org/)
 * kubectl (https://kubernetes.io/docs/tasks/tools/install-kubectl/)
 * git (https://kubernetes.io/docs/tasks/tools/install-kubectl/)
 
-## 仮想マシンのホスト環境
-
-Vagrant と VirtualBox が動作するOSが必要です。
-
-* Windows10　
-* MacOS
-* Linux
-
-推奨ハードウェアと言えるか、このコードの筆者の環境は以下のとおりです。
-
-* RAM: 8GB 以上
-* ストレージ: 空き領域 5GB 以上
-* CPU: Intel Core i5 以上
 
 
-## Kubernetesの起動方法
-
-起動するためのコマンドは、どのOSでも同じです。 GitHubから、このコードをクローンして、vagrant up するだけです。このコマンドの実行中は、仮想サーバーのイメージ、コンテナイメージなど、大量のダウンロードが発生します。
-
-
-~~~
-$ git clone -b 1.15 https://github.com/takara9/vagrant-kubernetes
-$ cd vagrant-Kubernetes
-$ vagrant up
-~~~
-
-上記のコマンドを実行して、20分程度で、master, node1, node2 の３台の仮想サーバーからなる kubernetes クラスタが起動します。
 
 ~~~
 $ vagrant ssh master
 
-vagrant@master:~$ kubectl get node
-NAME     STATUS   ROLES    AGE   VERSION
-master   Ready    master   98s   v1.16.3
-node1    Ready    <none>   56s   v1.16.3
-node2    Ready    <none>   62s   v1.16.3
+vagrant@bootnode:~/k8s$ kubectl get node
+NAME      STATUS   ROLES    AGE     VERSION
+master1   Ready    master   10m     v1.16.8
+master2   Ready    <none>   9m43s   v1.16.8
+master3   Ready    <none>   9m43s   v1.16.8
+node1     Ready    <none>   9m19s   v1.16.8
+node2     Ready    <none>   9m19s   v1.16.8
+node3     Ready    <none>   9m18s   v1.16.8
 
-vagrant@master:~$ kubectl version --short
-Client Version: v1.16.3
-Server Version: v1.16.3
+vagrant@bootnode:~/k8s$ kubectl version --short
+Client Version: v1.16.8
+Server Version: v1.16.8
+
 
 vagrant@master:~$ kubectl get componentstatus
+NAME                 AGE
+vagrant@bootnode:~/k8s$ kubectl get componentstatus
 NAME                 AGE
 controller-manager   <unknown>
 scheduler            <unknown>
 etcd-0               <unknown>
+etcd-1               <unknown>
 
-vagrant@master:~$ kubectl cluster-info
-Kubernetes master is running at https://172.16.20.11:6443
-KubeDNS is running at https://172.16.20.11:6443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
-Metrics-server is running at https://172.16.20.11:6443/api/v1/namespaces/kube-system/services/https:metrics-server:/proxy
-
-To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
-
+vagrant@bootnode:~/k8s$ kubectl cluster-info
+Kubernetes master is running at https://172.16.2.21:6443
+KubeDNS is running at https://172.16.2.21:6443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
+Metrics-server is running at https://172.16.2.21:6443/api/v1/namespaces/kube-system/services/https:metrics-server:/proxy
 ~~~
+
 
 1.16 の kubectlは次のコマンドでは componentstatus が動かない様です。バージョン 1.15 のkubeclt を利用すると表示されます。参考URL https://discuss.kubernetes.io/t/component-status-showing-unknown-in-a-multi-master-cluster/8034
 
@@ -98,6 +84,7 @@ master   Ready    master   25m   v1.16.0
 node1    Ready    <none>   24m   v1.16.0
 node2    Ready    <none>   24m   v1.16.0
 ~~~
+
 
 Linux / macOS では、git clone で作成されたディレクトリで、次のコマンドを実行します。
 ~~~
