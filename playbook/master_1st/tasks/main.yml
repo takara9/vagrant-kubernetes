@@ -94,23 +94,28 @@
 #    name: kubelet
 #
 
+## kubeconfigディレクトリ作成
+#
+- include_tasks: tasks/kubeconfig_setup.yml
+
+
 ## kubeconfigディレクトリ作成とクライアント証明配置
 ##
-- name: mkdir kubeconfig
-  file:
-    path:  /home/vagrant/.kube
-    state: directory
-    owner: vagrant
-    group: vagrant
-    mode:  '0755'
-- name: copy kube-config to home dir
-  copy:
-    src:  /mnt/k8s-pki/admin.conf
-    dest: /home/vagrant/.kube/config
-    remote_src: yes
-    owner: vagrant
-    group: vagrant
-    mode:  '0600'
+#- name: mkdir kubeconfig
+#  file:
+#    path:  /home/vagrant/.kube
+#    state: directory
+#    owner: vagrant
+#    group: vagrant
+#    mode:  '0755'
+#- name: copy kube-config to home dir
+#  copy:
+#    src:  /mnt/k8s-pki/admin.conf
+#    dest: /home/vagrant/.kube/config
+#    remote_src: yes
+#    owner: vagrant
+#    group: vagrant
+#    mode:  '0600'
 
 
 
