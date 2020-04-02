@@ -35,7 +35,7 @@
   modprobe:
     name: br_netfilter
     state: present
-  when:
+  #when:
     #- ansible_facts.distribution == "Ubuntu"
     #- container_engine == "containerd"
 - name: Set sysctl bridge
@@ -54,7 +54,6 @@
     sysctl_file: /etc/sysctl.conf      
     state: present
     reload: yes
-
 
 ##################################################
 ##  Docker CE のインストール

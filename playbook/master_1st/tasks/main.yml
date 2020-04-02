@@ -1,0 +1,115 @@
+## k8sマスタの設定をリセット
+##
+- name: "kubeadm reset v1.11 or later"
+  command: kubeadm reset -f
+
+
+## マスターノード構成用の構成ファイルを作成 
+##
+- name: copy from home to local
+  copy:
+    src: "/mnt/k8s-config/kubeadm-config.tmp"
+    dest: "/tmp/kubeadm-config.yaml"
+
+- name: change IP address & hostname
+  replace:
+    dest: "/tmp/kubeadm-config.yaml"
+    regexp: '__NODE_IP_ADDR__'
+    replace: "{{ ansible_facts.enp0s8.ipv4.address }}"
+- replace:
+    dest: "/tmp/kubeadm-config.yaml"
+    regexp: '__NODE_HOSTNAME__'
+    replace: "{{ ansible_facts.hostname }}"
+- replace:
+    dest: "/tmp/kubeadm-config.yaml"
+    regexp: '__LB_IP_ADDR__'
+    replace: "172.16.2.21"
+
+
+## 一番最初のマスターノード etcdサーバーを構成
+##
+- command: kubeadm init --config=/tmp/kubeadm-config.yaml
+  register: join_ubuntu
+  args:
+    chdir: /home/vagrant
+  when:
+    - ansible_facts.distribution == "Ubuntu"
+
+
+## Join用トークンを書き出す
+##
+#- debug: msg="{{ join_ubuntu }}"
+
+- debug: msg="example command == {{ join_ubuntu.stdout_lines[-2].split('--token')[1].split(' ')[1] }} {{ join_ubuntu.stdout_lines[-1].split('--discovery-token-ca-cert-hash')[1].split(' ')[1] }}"
+
+
+## k8sノード用コマンドを保存（マスターノード用）
+## 
+- name: Write discovery-token-ca-cert-hash and tls toke for other master nodes
+  shell: echo "token" ":" "{{ join_ubuntu.stdout_lines[-2].split('--token')[1].split(' ')[1] }}"  > /mnt/k8s-config/token.yaml
+- shell: echo "discovery_token_ca_cert_hash" ":" {{ join_ubuntu.stdout_lines[-1].split('--discovery-token-ca-cert-hash')[1].split(' ')[1] }}  > /mnt/k8s-config/discovery-token-ca-cert-hash.yaml
+
+
+## k8sノード用コマンドを保存（ワーカーノード用）Ubuntu
+## 
+- name: create kubeadm join command
+  shell: echo "join_command" ":" {{ join_ubuntu.stdout_lines[-2] }} {{ join_ubuntu.stdout_lines[-1] }} > /mnt/k8s-config/kubeadm-join.tmp
+
+
+## Kubernetesの証明書をNFSサーバーへコピー
+##
+- name: copy kubernetes pki files to nfs server on bootnode
+  shell: |
+    cp /etc/kubernetes/pki/ca.crt /mnt/k8s-pki
+    cp /etc/kubernetes/pki/ca.key /mnt/k8s-pki
+    cp /etc/kubernetes/pki/sa.key /mnt/k8s-pki
+    cp /etc/kubernetes/pki/sa.pub /mnt/k8s-pki
+    cp /etc/kubernetes/pki/front-proxy-ca.crt /mnt/k8s-pki
+    cp /etc/kubernetes/pki/front-proxy-ca.key /mnt/k8s-pki
+    cp /etc/kubernetes/pki/etcd/ca.crt /mnt/k8s-pki/etcd-ca.crt
+    cp /etc/kubernetes/pki/etcd/ca.key /mnt/k8s-pki/etcd-ca.key
+    cp /etc/kubernetes/pki/etcd/server.crt /mnt/k8s-pki/etcd.crt
+    cp /etc/kubernetes/pki/etcd/server.key /mnt/k8s-pki/etcd.key
+    cp /etc/kubernetes/admin.conf /mnt/k8s-pki
+    chown vagrant:vagrant /mnt/k8s-pki/*
+    chmod 0644 /mnt/k8s-pki/*
+
+
+## kubeletのDNSのIPアドレスを変更
+##
+- name: change config.yaml
+  replace:
+    dest: /var/lib/kubelet/config.yaml
+    regexp: '10.96.0.10'
+    replace: 10.32.0.10
+
+
+## kubeletをリスタートして変更を反映
+##
+- name: daemon-reload and restart kubelet
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: kubelet
+
+
+## kubeconfigディレクトリ作成とクライアント証明配置
+##
+- name: mkdir kubeconfig
+  file:
+    path:  /home/vagrant/.kube
+    state: directory
+    owner: vagrant
+    group: vagrant
+    mode:  '0755'
+- name: copy kube-config to home dir
+  copy:
+    src:  /mnt/k8s-pki/admin.conf
+    dest: /home/vagrant/.kube/config
+    remote_src: yes
+    owner: vagrant
+    group: vagrant
+    mode:  '0600'
+
+
+

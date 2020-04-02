@@ -1,13 +1,16 @@
 ##
 ##　追加のコントロールプレーン用
 ##　
-##
+
+
 ## k8sの設定をリセット
-#
+##
 - name: kubeadm reset
   command: kubeadm reset -f
 
+
 ## 証明書等を1stマスターからコピーする
+##
 - name: copy pki files from 1st master
   file:
     path: /etc/kubernetes/pki
@@ -21,8 +24,6 @@
     recurse: yes
     owner: root
     group: root
-
-
 - shell: |
     #cp /mnt/k8s-pki/ca.crt /etc/kubernetes/pki
     cp /mnt/k8s-pki/ca.key /etc/kubernetes/pki
@@ -40,17 +41,13 @@
     chmod 0644 /etc/kubernetes/pki/*.crt
     exit 0
 
-## k8sクラスタへマスターとして参加
-#
 
-
+## k8sクラスタへマスターとして参加するための構成ファイル作成
+##
 - name: copy from home to local
   copy:
     src: "/mnt/k8s-config/kubeadm-config-for-join.tmp"
     dest: "/tmp/kubeadm-config.yaml"
-#- copy:
-#    src: "/mnt/k8s-config/kubeadm-config-for-join.tmp"
-#    dest: "/tmp/kubeadm-join-master.yaml"
 
 - name: change IP address & hostname
   replace:
@@ -74,22 +71,14 @@
     regexp: '__TOKEN__'
     replace: "{{ token }}"
 
-
-#- name: include kubeadm join token etc
-#  #include_vars: "/tmp/kubeadm-join-master.yaml"
-#  include_vars: "/mnt/k8s-config/kubeadm-join-master.tmp"
-- debug: msg="token = {{ token }}"
-#- debug: msg="discovery_token_ca_cert_hash = {{ discovery_token_ca_cert_hash }} "
-- debug: msg="kubeadm join --config /tmp/kubeadm-config.yaml --discovery-token-ca-cert-hash {{ discovery_token_ca_cert_hash }}"
-#- name: kubeadm join for control plane
-#  shell: kubeadm join --config /tmp/kubeadm-config.yaml --discovery-token-ca-cert-hash "{{ discovery_token_ca_cert_hash }}"
-
-- name: kubeadm join for control plane
+## 2nd マスターノードの構成
+##
+- name: build 2nd master nodes
   shell: kubeadm join --config /tmp/kubeadm-config.yaml
 
 
 ## kubeletのDNSのIPアドレスを変更
-#
+##
 - name: change config.yaml
   replace:
     dest: /var/lib/kubelet/config.yaml
@@ -97,13 +86,14 @@
     replace: 10.32.0.10
 
 ## kubeletをリスタートして変更を反映
-#
+##
 - name: daemon-reload and restart kubelet
   systemd:
     state: restarted
     daemon_reload: yes
     name: kubelet
-    
+
+
 ## kubeconfigディレクトリ作成
 #
 - name: mkdir kubeconfig
@@ -113,24 +103,6 @@
     owner: vagrant
     group: vagrant
     mode:  '0755'
-
-#- name: mkdir /vagrant/kubeconfig
-#  file:
-#    path:  /vagrant/kubeconfig
-#    state: directory
-#    owner: vagrant
-#    group: vagrant
-#    mode:  '0755'
-
-##  configファイルのコピー
-#
-#- name: chmod admin.conf
-#  file:
-#    path:  /etc/kubernetes/admin.conf
-#    owner: vagrant
-#    group: vagrant
-#    mode:  '0600'
-    
 - name: copy config to home dir
   copy:
     src:  /etc/kubernetes/admin.conf

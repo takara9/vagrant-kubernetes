@@ -1,12 +1,12 @@
 ---
-- name: config test mode
+- name: config boot node
   hosts: bootnode
   gather_facts: true
   become: true
   roles:
   - bootnode
 
-- name: config test mode
+- name: config master & worker node
   hosts: all
   gather_facts: true
   become: true

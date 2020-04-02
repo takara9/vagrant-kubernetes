@@ -1,17 +1,16 @@
 ## k8sノードをリセット
-#
+##
 - name: kubeadm reset
   command: kubeadm reset -f
 
+
+
 ## k8sクラスタへ参加
-#
+##
 - name: copy from home to local
   copy:
     src: /mnt/k8s-config/kubeadm-join.tmp
     dest: /tmp/kubeadm-join.yaml
-
-#- name: include kubeadm join token etc
-#  include_vars: /tmp/kubeadm-join.yaml
 
 - name: include kubeadm join token etc
   include_vars: /mnt/k8s-config/kubeadm-join.tmp
@@ -24,7 +23,7 @@
 
 
 ## kubeletのDNSのIPアドレスを変更
-#
+##
 - name: change config.yaml
   replace:
     dest: /var/lib/kubelet/config.yaml
@@ -32,7 +31,7 @@
     replace: 10.32.0.10
 
 ## kubeletをリスタートして変更を反映
-#
+##
 - name: daemon-reload and restart kubelet
   systemd:
     state: restarted

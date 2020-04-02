@@ -29,7 +29,7 @@
   become_user: root
   become_method: sudo
   roles:
-    - master
+    - master_1st
 
 - name: apply flannel
   hosts:
@@ -90,7 +90,7 @@
   become_user: root
   become_method: sudo
   roles:
-    - master2
+    - master_2nd
 
 - name: K8s Worker node setup
   hosts: nodes
