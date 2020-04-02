@@ -1,3 +1,14 @@
+- name: Download Containerd
+  hosts:
+  - bootnode
+  tasks: 
+    get_url:
+      url: https://storage.googleapis.com/cri-containerd-release/cri-containerd-{{ containerd_version }}.linux-amd64.tar.gz
+      dest: /srv/k8s/download/cri-containerd-{{ containerd_version }}.linux-amd64.tar.gz
+      mode: '0644'
+    when:
+      - container_engine == "containerd"
+
 - name: k8s base install
   hosts:
   - masters
