@@ -1,13 +1,18 @@
-- name: Download Containerd
+#
+# Kubernetes Cluster setup playbook
+#
+
+- name: Download a containerd on NFS server
   hosts:
   - bootnode
-  tasks: 
-    get_url:
-      url: https://storage.googleapis.com/cri-containerd-release/cri-containerd-{{ containerd_version }}.linux-amd64.tar.gz
-      dest: /srv/k8s/download/cri-containerd-{{ containerd_version }}.linux-amd64.tar.gz
-      mode: '0644'
-    when:
-      - container_engine == "containerd"
+  tasks:
+    - name downloading 
+      get_url:
+        url: https://storage.googleapis.com/cri-containerd-release/cri-containerd-{{ containerd_version }}.linux-amd64.tar.gz
+        dest: /srv/k8s/download/cri-containerd-{{ containerd_version }}.linux-amd64.tar.gz
+        mode: '0644'
+      when:
+        - container_engine == "containerd"
 
 - name: k8s base install
   hosts:
