@@ -3,6 +3,7 @@
 # https://github.com/kubernetes/kubernetes/blob/master/cmd/kubeadm/app/apis/kubeadm/v1beta2/doc.go
 # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/control-plane-flags/
 #
+
 apiVersion: kubeadm.k8s.io/v1beta2
 kind: InitConfiguration
 localAPIEndpoint:
@@ -22,7 +23,7 @@ discovery:
   timeout: 5m0s
   tlsBootstrapToken: __TOKEN__
 nodeRegistration:
-  criSocket: /var/run/dockershim.sock
+  #criSocket: /var/run/dockershim.sock
   name: __NODE_HOSTNAME__
   taints:
   - effect: NoSchedule
