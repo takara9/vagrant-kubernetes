@@ -1,0 +1,15 @@
+## kubeletのDNSのIPアドレスを変更
+##
+- name: change config.yaml
+  replace:
+    dest: /var/lib/kubelet/config.yaml
+    regexp: '10.96.0.10'
+    replace: 10.32.0.10
+
+## kubeletをリスタートして変更を反映
+##
+- name: daemon-reload and restart kubelet
+  systemd:
+    state: restarted
+    daemon_reload: yes
+    name: kubelet
