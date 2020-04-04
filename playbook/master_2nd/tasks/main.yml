@@ -25,7 +25,7 @@
     owner: root
     group: root
 - shell: |
-    #cp /mnt/k8s-pki/ca.crt /etc/kubernetes/pki
+    cp /mnt/k8s-pki/ca.crt /etc/kubernetes/pki
     cp /mnt/k8s-pki/ca.key /etc/kubernetes/pki
     cp /mnt/k8s-pki/sa.key /etc/kubernetes/pki
     cp /mnt/k8s-pki/sa.pub /etc/kubernetes/pki
@@ -44,6 +44,11 @@
 
 ## k8sクラスタへマスターとして参加するための構成ファイル作成
 ##
+- name: remove /tmp/kubeadm-config.yaml
+  file:
+    path: "/tmp/kubeadm-config.yaml"
+    state: absent
+
 - name: copy from home to local
   copy:
     src: "/mnt/k8s-config/kubeadm-config-for-join.tmp"
@@ -74,9 +79,16 @@
 
 ## 2nd マスターノードの構成
 ##
-- name: build 2nd master nodes
-  shell: kubeadm join --config /tmp/kubeadm-config.yaml
+#- name: build 2nd master nodes
+#  shell: kubeadm join --config /tmp/kubeadm-config.yaml
+#  register: join_result
+#- debug: msg="2nd master = {{ join_result }}"
 
+###########
+- name: include kubeadm join token etc
+  include_vars: /mnt/k8s-config/kubeadm-join-master.tmp
+#- command: "{{ join_command }}"  
+###########
 
 ## kubeletのDNSのIPアドレスを変更
 ##

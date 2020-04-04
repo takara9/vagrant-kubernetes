@@ -6,6 +6,11 @@
 
 ## マスターノード構成用の構成ファイルを作成 
 ##
+- name: remove /tmp/kubeadm-config.yaml
+  file:
+    path: "/tmp/kubeadm-config.yaml"
+    state: absent
+
 - name: copy from home to local
   copy:
     src: "/mnt/k8s-config/kubeadm-config.tmp"
@@ -40,11 +45,15 @@
 ##
 #- debug: msg="{{ join_ubuntu }}"
 
-- debug: msg="example command == {{ join_ubuntu.stdout_lines[-2].split('--token')[1].split(' ')[1] }} {{ join_ubuntu.stdout_lines[-1].split('--discovery-token-ca-cert-hash')[1].split(' ')[1] }}"
+#- debug: msg="example command == {{ join_ubuntu.stdout_lines[-2].split('--token')[1].split(' ')[1] }} {{ join_ubuntu.stdout_lines[-1].split('--discovery-token-ca-cert-hash')[1].split(' ')[1] }}"
 
 
 ## k8sノード用コマンドを保存（マスターノード用）
-## 
+##
+#- debug: msg="{{ join_ubuntu }}"
+- name: create kubeadm master join command
+  shell: echo "join_command" ":" {{ join_ubuntu.stdout_lines[-8] }} {{ join_ubuntu.stdout_lines[-7] }} {{ join_ubuntu.stdout_lines[-6] }} > /mnt/k8s-config/kubeadm-join-master.tmp
+
 - name: Write discovery-token-ca-cert-hash and tls toke for other master nodes
   shell: echo "token" ":" "{{ join_ubuntu.stdout_lines[-2].split('--token')[1].split(' ')[1] }}"  > /mnt/k8s-config/token.yaml
 - shell: echo "discovery_token_ca_cert_hash" ":" {{ join_ubuntu.stdout_lines[-1].split('--discovery-token-ca-cert-hash')[1].split(' ')[1] }}  > /mnt/k8s-config/discovery-token-ca-cert-hash.yaml

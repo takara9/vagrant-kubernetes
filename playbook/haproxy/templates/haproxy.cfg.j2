@@ -50,3 +50,19 @@ backend api_servers
      server master1 172.16.2.11:6443 check
      server master2 172.16.2.12:6443 check
      server master3 172.16.2.13:6443 check
+
+
+frontend etcd_frontend
+     bind *:2379
+     mode tcp
+     option tcplog
+     default_backend etcd_servers
+
+backend etcd_servers
+     mode tcp
+     balance roundrobin
+     option ssl-hello-chk
+     default-server inter 10s fall 2
+     server master1 172.16.2.11:2379 check
+     server master2 172.16.2.12:2379 check
+     server master3 172.16.2.13:2379 check

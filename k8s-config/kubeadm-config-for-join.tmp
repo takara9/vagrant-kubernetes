@@ -76,15 +76,15 @@ etcd:
     dataDir: "/var/lib/etcd"
     extraArgs:
        name: __NODE_HOSTNAME__
-       listen-client-urls: https://127.0.0.1:2379,https://__NODE_IP_ADDR__:2379
-       advertise-client-urls: https://__NODE_IP_ADDR__:2379
+       listen-client-urls: https://127.0.0.1:2379,https://172.16.2.21:2379,https://172.16.2.11:2379,https://172.16.2.12:2379,https://172.16.2.13:2379
+       advertise-client-urls: https://__NODE_IP_ADDR__:2379,https://172.16.2.21:2379
        cert-file: /etc/kubernetes/pki/etcd/server.crt 
        client-cert-auth: "true"
        data-dir: /var/lib/etcd 
        initial-advertise-peer-urls: https://__NODE_IP_ADDR__:2380
        initial-cluster: __NODE_HOSTNAME__=https://__NODE_IP_ADDR__:2380
        key-file: /etc/kubernetes/pki/etcd/server.key 
-       listen-peer-urls: https://172.16.2.11:2380
+       listen-peer-urls: https://172.16.2.11:2380,https://172.16.2.12:2380,https://172.16.2.13:2380
        listen-metrics-urls: http://127.0.0.1:2381
        peer-cert-file: /etc/kubernetes/pki/etcd/peer.crt 
        peer-client-cert-auth: "true"

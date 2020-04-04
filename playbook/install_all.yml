@@ -38,6 +38,35 @@
   roles:
     - haproxy
 
+- name: copy config for master
+  hosts:
+  - bootnode
+  gather_facts: true
+  tasks:
+    - name: remove conf for join master
+      file: 
+        path: /srv/k8s/k8s-config/kubeadm-config-for-join.tmp
+        state: absent
+    - name: remove conf for master
+      file: 
+        path: /srv/k8s/k8s-config/kubeadm-config.tmp
+        state: absent
+    - name: copy config template for join
+      copy:
+        src:  /home/vagrant/k8s/k8s-config/kubeadm-config-for-join.tmp
+        dest: /srv/k8s/k8s-config/kubeadm-config-for-join.tmp
+        owner: vagrant
+        group: vagrant
+        mode: '0644'
+    - name: copy config template for init
+      copy:
+        src:  /home/vagrant/k8s/k8s-config/kubeadm-config.tmp
+        dest: /srv/k8s/k8s-config/kubeadm-config.tmp
+        owner: vagrant
+        group: vagrant
+        mode: '0644'
+
+
 - name: K8s Master 1st node setup
   hosts: master1
   gather_facts: true

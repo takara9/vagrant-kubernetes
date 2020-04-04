@@ -87,21 +87,21 @@
     update: yes
   become_user: vagrant    
 
-- name: copy config template for join
-  copy:
-    src:  /home/vagrant/k8s/k8s-config/kubeadm-config-for-join.tmp
-    dest: /srv/k8s/k8s-config/kubeadm-config-for-join.tmp
-    owner: vagrant
-    group: vagrant
-    mode: '0644'
+#- name: copy config template for join
+#  copy:
+#    src:  /home/vagrant/k8s/k8s-config/kubeadm-config-for-join.tmp
+#    dest: /srv/k8s/k8s-config/kubeadm-config-for-join.tmp
+#    owner: vagrant
+#    group: vagrant
+#    mode: '0644'
 
-- name: copy config template for init
-  copy:
-    src:  /home/vagrant/k8s/k8s-config/kubeadm-config.tmp
-    dest: /srv/k8s/k8s-config/kubeadm-config.tmp
-    owner: vagrant
-    group: vagrant
-    mode: '0644'
+#- name: copy config template for init
+#  copy:
+#    src:  /home/vagrant/k8s/k8s-config/kubeadm-config.tmp
+#    dest: /srv/k8s/k8s-config/kubeadm-config.tmp
+#    owner: vagrant
+#    group: vagrant
+#    mode: '0644'
 
 
 #############################
