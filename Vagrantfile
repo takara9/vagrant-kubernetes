@@ -2,13 +2,11 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-<<<<<<< HEAD
-#linux_os = "ubuntu/xenial64"   # Ubuntu 16.04
-=======
->>>>>>> dc8e5a30bb5cd90dfa089a21aeeed496da6bcbc0
+
 linux_os = "ubuntu/bionic64"   # Ubuntu 18.04
 #linux_os  = "generic/centos7"  # CentOS 7.7
 #linux_os  = "generic/centos8"  # CentOS 8
+
 bridge_if = "en0: Wi-Fi (Wireless)"
 
 vm_spec = [
@@ -78,13 +76,8 @@ Vagrant.configure("2") do |config|
 
       v.vm.provision "ansible_local" do |ansible|
         ansible.playbook       = "playbook/" + spec[:playbook]
-<<<<<<< HEAD
         ansible.install_mode   = "pip3"
         ansible.version        = "2.9.6"
-=======
-        ansible.install_mode   = "pip"
-        ansible.version        = "2.9.6"    
->>>>>>> dc8e5a30bb5cd90dfa089a21aeeed496da6bcbc0
         ansible.verbose        = false
         ansible.install        = true
         ansible.limit          = spec[:name] 

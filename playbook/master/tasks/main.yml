@@ -32,10 +32,7 @@
 ## terraformを使う場合は修正
 - name: copy /tmp/kubeadm-join.yaml -> home
   command: cp /tmp/kubeadm-join.yaml /vagrant/kubeadm-join.tmp
-<<<<<<< HEAD
-=======
 
->>>>>>> dc8e5a30bb5cd90dfa089a21aeeed496da6bcbc0
 
 ## kubeletのDNSのIPアドレスを変更
 #
