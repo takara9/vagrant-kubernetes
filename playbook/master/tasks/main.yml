@@ -104,27 +104,33 @@
   command: kubectl apply -f /home/vagrant/kube-flannel.yml
 
 
-## Metrics Server インストール
-#
 - name: Install Metrics Server
-  git:
-    repo: 'https://github.com/kubernetes-sigs/metrics-server'
-    dest: /home/vagrant/metrics-server
-  become_user: vagrant    
+  get_url:
+    url: https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.3.6/components.yaml
+    dest: /home/vagrant/metrics-server.yaml
+    mode: '0644'
+  become_user: vagrant
 
 - name: add a new line
   blockinfile:
-    path: /home/vagrant/metrics-server/deploy/kubernetes/metrics-server-deployment.yaml
+    path: /home/vagrant/metrics-server.yaml
     insertafter: '        args:'
     block: |
            # added lines
                      - --kubelet-insecure-tls
                      - --kubelet-preferred-address-types=InternalIP,ExternalIP,Hostname
+  become_user: vagrant
 
 - name: Deploy Metrics Server
+  command: kubectl apply -f /home/vagrant/metrics-server.yaml
   become_user: vagrant
-  command: kubectl apply -f /home/vagrant/metrics-server/deploy/kubernetes
+  args:
+    chdir: /home/vagrant
+  become_user: vagrant
 
+
+
+  
 ## Dashboard UI インストール
 #
 - name: Download Dashboard Manifest
