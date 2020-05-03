@@ -31,9 +31,7 @@
 ## vagrantのディレクトリへコピー
 ## terraformを使う場合は修正
 - name: copy /tmp/kubeadm-join.yaml -> home
-  copy:
-    src: /tmp/kubeadm-join.yaml
-    dest: /vagrant/kubeadm-join.tmp
+  command: cp /tmp/kubeadm-join.yaml /vagrant/kubeadm-join.tmp
 
 
 ## kubeletのDNSのIPアドレスを変更
@@ -89,9 +87,18 @@
 
 ## flannelのコピー
 #
+- set_fact:
+    interface: enp0s8
+  when:
+    - ansible_facts.distribution == "Ubuntu"
+- set_fact:
+    interface: eth1
+  when:
+    - ansible_facts.distribution == "CentOS"
+
 - name: copy a manifest of Flannel for k8s ver > 11
   template:
-    src:  kube-flannel.yml
+    src:  kube-flannel.yml.j2
     dest: /home/vagrant/kube-flannel.yml
     mode: 0644
     owner: vagrant
