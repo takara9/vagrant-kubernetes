@@ -32,6 +32,10 @@
 ## terraformを使う場合は修正
 - name: copy /tmp/kubeadm-join.yaml -> home
   command: cp /tmp/kubeadm-join.yaml /vagrant/kubeadm-join.tmp
+<<<<<<< HEAD
+=======
+
+>>>>>>> dc8e5a30bb5cd90dfa089a21aeeed496da6bcbc0
 
 ## kubeletのDNSのIPアドレスを変更
 #
@@ -86,9 +90,18 @@
 
 ## flannelのコピー
 #
+- set_fact:
+    interface: enp0s8
+  when:
+    - ansible_facts.distribution == "Ubuntu"
+- set_fact:
+    interface: eth1
+  when:
+    - ansible_facts.distribution == "CentOS"
+
 - name: copy a manifest of Flannel for k8s ver > 11
   template:
-    src:  kube-flannel.yml
+    src:  kube-flannel.yml.j2
     dest: /home/vagrant/kube-flannel.yml
     mode: 0644
     owner: vagrant
@@ -152,9 +165,4 @@
         TOKEN=$(kubectl -n kubernetes-dashboard describe secret $(kubectl -n kubernetes-dashboard get secret |grep kubernetes-dashboard-token-* | awk '{print $1}') |awk '$1=="token:"{print $2}')
         kubectl config set-credentials kubernetes-admin --token="${TOKEN}"
 - name: copy config to host dir
-  copy:
-    src:  /home/vagrant/.kube/config
-    dest: /vagrant/kubeconfig/config
-    owner: vagrant
-    group: vagrant
-    mode:  '0600'
+  command: cp /home/vagrant/.kube/config /vagrant/kubeconfig/config
