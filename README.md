@@ -24,6 +24,10 @@ vagrant コマンドからクラスタを起動することで、パソコン上
 * git (https://kubernetes.io/docs/tasks/tools/install-kubectl/)
 
 
+MacOS版 VirtualBox 6.1.14、Vagrant 2.2.10 の組み合わせで動作を確認しました。もしインストールから時間が経過してvagrant up 実行後に、VirtualBoxのエラーが発生するようになった場合は、一旦, VituralBox と Vagrant を アンインストールして、最新版をインストールして起動を試みてください。筆者が試したところでは、無事に起動しました。
+
+
+
 ## 仮想マシンのホスト環境
 
 Vagrant と VirtualBox が動作するOSが必要です。
@@ -167,6 +171,8 @@ $KUBECONFIG にセットしたパスのファイルを選択します。そし�
 ## 質問や不具合についての注意事項
 
 この学習環境についての質問は、Issue https://github.com/takara9/vagrant-kubernetes/issues に投稿をお願いします。他の質問サイトなどに質問を投稿することは問題ありませんが、筆者は対応しません。
+
+
 
 
 以上
