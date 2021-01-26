@@ -124,7 +124,6 @@
 
 - name: Deploy Metrics Server
   command: kubectl apply -f /home/vagrant/metrics-server-deployment.yaml
-  become_user: vagrant
   args:
     chdir: /home/vagrant
   become_user: vagrant

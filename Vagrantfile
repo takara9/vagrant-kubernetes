@@ -14,14 +14,14 @@ vm_spec = [
     storage: [], playbook: "install_master.yml",
     comment: "Master node" },
 
-  { name: "node1", cpu: 1, memory: 1024,
+  { name: "node1", cpu: 4, memory: 8192,
     box: linux_os,
     private_ip: "172.16.20.12",
     public_ip: "192.168.1.92",
     storage: [], playbook: "install_node.yml",
     comment: "Worker node #1" },
 
-  { name: "node2", cpu: 1, memory: 1024,
+  { name: "node2", cpu: 4, memory: 8192,
     box: linux_os,
     private_ip: "172.16.20.13",
     public_ip: "192.168.1.93",
@@ -73,8 +73,6 @@ Vagrant.configure("2") do |config|
 
       v.vm.provision "ansible_local" do |ansible|
         ansible.playbook       = "playbook/" + spec[:playbook]
-        ansible.install_mode   = "pip"
-        ansible.version        = "2.9.6"    
         ansible.verbose        = false
         ansible.install        = true
         ansible.limit          = spec[:name] 
